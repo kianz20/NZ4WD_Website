@@ -1,16 +1,15 @@
 import { Typography } from "@mui/material";
 import { Header, Navbar } from "../components";
-
-const Home = () => {
+const Article = () => {
   return (
     <>
       <Header />
       <Navbar />
       <Typography variant="h4" component="h1">
-        Home
+        Article
       </Typography>
     </>
   );
 };
 
-export default Home;
+export default Article;

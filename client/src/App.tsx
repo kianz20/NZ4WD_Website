@@ -1,16 +1,28 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import AboutUs from "./pages/AboutUs";
-import ContactUs from "./pages/ContactUs";
-import "./App.css";
+
+import {
+  Home,
+  ContactUs,
+  Articles,
+  Article,
+  Reviews,
+  Brands,
+  AboutUs,
+  LatestNews,
+} from "./pages";
 
 const App = () => {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/AboutUs" element={<AboutUs />} />
-        <Route path="/ContactUs" element={<ContactUs />} />
+        <Route path="/latestNews" element={<LatestNews />} />
+        <Route path="/articles" element={<Articles />} />
+        <Route path="/articles/:id" element={<Article />} />
+        <Route path="/reviews" element={<Reviews />} />
+        <Route path="/brands" element={<Brands />} />
+        <Route path="/aboutUs" element={<AboutUs />} />
+        <Route path="/contactUs" element={<ContactUs />} />
       </Routes>
     </>
   );

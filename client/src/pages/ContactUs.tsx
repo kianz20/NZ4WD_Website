@@ -1,9 +1,10 @@
 import { Typography } from "@mui/material";
-import { Navbar } from "../components";
+import { Header, Navbar } from "../components";
 
 const ContactUs = () => {
   return (
     <>
+      <Header />
       <Navbar />
       <Typography variant="h4" component="h1">
         Contact Us
