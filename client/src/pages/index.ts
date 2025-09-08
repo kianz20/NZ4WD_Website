@@ -1,6 +1,7 @@
 export { default as AboutUs } from "./AboutUs";
 export { default as Articles } from "./Articles";
 export { default as Article } from "./Article";
+export { default as ArticleEditor } from "./ArticleEditor";
 export { default as Brands } from "./Brands";
 export { default as ContactUs } from "./ContactUs";
 export { default as Home } from "./Home";

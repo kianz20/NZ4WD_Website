@@ -9,6 +9,7 @@ import {
   Brands,
   AboutUs,
   LatestNews,
+  ArticleEditor,
 } from "./pages";
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/latestNews" element={<LatestNews />} />
         <Route path="/articles" element={<Articles />} />
+        <Route path="/article" element={<ArticleEditor />} />
         <Route path="/articles/:id" element={<Article />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/brands" element={<Brands />} />
