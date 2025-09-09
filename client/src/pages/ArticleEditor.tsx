@@ -1,4 +1,10 @@
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -10,7 +16,6 @@ import { useAuth } from "../hooks";
 import dayjs from "dayjs";
 import type { PickerValue } from "@mui/x-date-pickers/internals";
 import * as api from "../api/articleController";
-
 const ArticleEditor = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
@@ -72,18 +77,23 @@ const ArticleEditor = () => {
   const [formValues, setFormValues] = useState({
     publishDate: dayjs(),
     title: "",
+    readyToPublish: false,
   });
 
-  const handleChange = (field: string, value: string | PickerValue) => {
+  const handleChange = (
+    field: string,
+    value: string | PickerValue | boolean
+  ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
-    const { publishDate, title } = formValues;
+    const { publishDate, title, readyToPublish } = formValues;
     const transformedData = {
       author: authorName!,
       title: title,
+      readyToPublish: readyToPublish,
       publishDate: publishDate?.toISOString(),
       content: getContent() || "",
     };
@@ -136,6 +146,17 @@ const ArticleEditor = () => {
 
         <div ref={editorRef} style={{ height: 400 }} />
 
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="readyToPublish"
+              checked={formValues.readyToPublish} // use checked instead of value
+              onChange={(e) => handleChange("readyToPublish", e.target.checked)}
+            />
+          }
+          label="Ready to Publish"
+        />
+        <br />
         <Button type="submit">Submit</Button>
       </form>
 

@@ -22,6 +22,9 @@ const UserMenu = ({ username }: { username: string }) => {
       </Box>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={() => navigate("/article")}>New Article</MenuItem>
+        <MenuItem onClick={() => navigate("/articleList")}>
+          All Articles
+        </MenuItem>
         {/* <MenuItem
           onClick={() => {
             navigate("/article");

@@ -5,8 +5,15 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { author, title, content, publishDate, edited, editedDate } =
-      req.body;
+    const {
+      author,
+      title,
+      content,
+      readyToPublish,
+      publishDate,
+      edited,
+      editedDate,
+    } = req.body;
 
     if (!author || !content) {
       return res.status(400).json({ error: "Author and Content are required" });
@@ -17,6 +24,7 @@ router.post("/", async (req, res) => {
       title,
       content,
       publishDate,
+      readyToPublish,
       edited,
       editedDate,
     });
