@@ -129,8 +129,14 @@ const ArticleEditor = () => {
         content: getContent() || "",
       };
       try {
-        await api.createArticle(transformedData, userToken);
-        showToast("Article Saved", "success");
+        if (id) {
+          await api.updateArticle(id, transformedData, userToken);
+          showToast("Article Updated", "success");
+        } else {
+          await api.createArticle(transformedData, userToken);
+          showToast("Article Created", "success");
+        }
+
         navigate("/articleList");
       } catch {
         showToast("Save failed", "error");
@@ -170,7 +176,6 @@ const ArticleEditor = () => {
           onChange={(e) => handleChange("title", e.target.value)}
         />
         <br />
-        {/* Dedicated toolbar container */}
         <div id="toolbar">
           <button className="ql-bold" />
           <button className="ql-italic" />

@@ -40,6 +40,60 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      author,
+      title,
+      content,
+      readyToPublish,
+      publishDate,
+      edited,
+      editedDate,
+    } = req.body;
+
+    if (!author || !content) {
+      return res.status(400).json({ error: "Author and Content are required" });
+    }
+
+    const query = { _id: id.toString() };
+
+    const update = {
+      $set: {
+        author: author,
+        title: title,
+        content: content,
+        readyToPublish: readyToPublish,
+        publishDate: publishDate,
+        edited: edited,
+        editedDate: editedDate,
+      },
+    };
+
+    const options = { new: true };
+    const updatedArticle = await Article.findOneAndUpdate(
+      query,
+      update,
+      options
+    );
+
+    if (!updatedArticle) {
+      return res
+        .status(404)
+        .json({ error: "Article ID does not match a product" });
+    }
+
+    res.json({ message: "Article Updated" });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        error: error.message,
+      });
+    }
+  }
+});
+
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const articles = await Article.find().select("-content");
