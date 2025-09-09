@@ -80,12 +80,9 @@ const ArticleList = () => {
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <Box display="flex" flexDirection={"row"}>
+        <Box display="flex" flexDirection={"row"} sx={{ height: "100%" }}>
           <Button onClick={() => handleEdit(params.id.toString())}>Edit</Button>
-          <Button
-            sx={{ cursor: "pointer", color: "red" }}
-            onClick={() => handleDelete(params.id.toString())}
-          >
+          <Button onClick={() => handleDelete(params.id.toString())}>
             Delete
           </Button>
         </Box>
@@ -98,7 +95,7 @@ const ArticleList = () => {
       <Header />
       <Navbar />
       <Typography variant="h4" component="h1">
-        Article List
+        Articles
       </Typography>
       <Box sx={{ height: 400, width: "100%" }}>
         <DataGrid
