@@ -29,25 +29,22 @@ import {
 // };
 
 export const loginUser = async (user: LoginBody): Promise<LoginResponse> => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/users/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
+  const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(user),
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return { error: errorData.error || "Something went wrong" };
-    }
+  const data = await response.json();
 
-    const data: LoginResponse = await response.json();
-    return data;
-  } catch (error) {
-    return { error: (error as Error).message };
+  if (!response.ok) {
+    throw {
+      message: data.error || "Something went wrong",
+      status: response.status,
+    };
   }
+
+  return data;
 };
 
 // export const getProfileData = async (

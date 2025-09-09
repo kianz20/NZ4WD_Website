@@ -4,6 +4,7 @@ export interface LoginResponse {
   user?: {
     id: string;
     username: string;
+    authorName: string;
     role: string;
   };
   error?: string;

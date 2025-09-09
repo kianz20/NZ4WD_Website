@@ -1,5 +1,5 @@
 import express from "express";
-import { Article } from "../models";
+import Article from "../models/Article.ts";
 
 const router = express.Router();
 
@@ -22,3 +22,5 @@ router.post("/", async (req, res) => {
     }
   }
 });
+
+export default router;

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// import articleRoutes from './routes/articles.js';
+import articleRoutes from "./routes/article.ts";
 import userRoutes from "./routes/user.ts";
 
 dotenv.config();
@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
-// app.use('/api/articles', articleRoutes);
+app.use("/api/articles", articleRoutes);
 app.use("/api/users", userRoutes);
 
 mongoose

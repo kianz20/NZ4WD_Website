@@ -19,7 +19,11 @@ const Navbar = () => {
       <Box display="flex" alignItems="center" justifyContent="space-between">
         {/* Left spacer */}
         <Box flex={1}>
-          <UserMenu username={username ?? "User"} />
+          {isAuthenticated && (
+            <UserMenu
+              username={username ? "Logged in as: " + username : "User"}
+            />
+          )}
         </Box>
 
         {/* Center buttons */}

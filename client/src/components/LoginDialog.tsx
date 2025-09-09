@@ -6,11 +6,10 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import type { LoginBody, LoginResponse } from "../models";
+import type { LoginBody, LoginError, LoginResponse } from "../models";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import * as api from "../api/userController";
-import { useAuth } from "../hooks";
+import { useAuth, useToast } from "../hooks";
 
 interface LoginDialogProps {
   open: boolean;
@@ -19,11 +18,14 @@ interface LoginDialogProps {
 
 const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
   const { setUserCookies } = useAuth();
+  const { showToast } = useToast();
 
   const [loginBody, setLoginBody] = useState<LoginBody>({
     username: "",
     password: "",
   });
+
+  const [error, setError] = useState(false);
 
   const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -33,25 +35,30 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
     }));
   };
 
-  const navigate = useNavigate();
-
   const handleLogin = async (event: { preventDefault: () => void }) => {
+    event.preventDefault();
     try {
-      event.preventDefault();
       const data: LoginResponse = await api.loginUser(loginBody);
-      if (data.error) {
-        console.error("Login failed: ", data.error);
-      } else {
-        setUserCookies(data);
-        // Navigate to the home page after successful login
-        navigate("/");
+      setUserCookies(data);
+      handleClose();
+    } catch (error: unknown) {
+      const err = error as LoginError;
+      console.error("Login failed:", err.message, "Status:", err.status);
+      setError(true);
+      if (err.status === 401) {
+        showToast("Username or Password is incorrect", undefined, "error");
       }
-    } catch (error) {
-      console.error("Error during login:", error);
     }
   };
+
+  const handleClose = () => {
+    setError(false);
+    setLoginBody({ username: "", password: "" });
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Editor Login</DialogTitle>
       <DialogContent>
         <form onSubmit={handleLogin}>
@@ -63,6 +70,7 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
             required
             value={loginBody.username}
             onChange={handleFormChange}
+            error={error}
           />
           <TextField
             label="Password"
@@ -73,9 +81,10 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
             required
             value={loginBody.password}
             onChange={handleFormChange}
+            error={error}
           />
           <DialogActions>
-            <Button type="button" onClick={onClose}>
+            <Button type="button" onClick={handleClose}>
               Close
             </Button>
             <Button type="submit" variant="contained" color="primary">
