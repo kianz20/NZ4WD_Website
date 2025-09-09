@@ -5,13 +5,21 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { author, content } = req.body;
+    const { author, title, content, publishDate, edited, editedDate } =
+      req.body;
 
     if (!author || !content) {
-      return res.status(400).json({ erorr: "Author and Content are required" });
+      return res.status(400).json({ error: "Author and Content are required" });
     }
 
-    const newArticle = new Article({ author, content });
+    const newArticle = new Article({
+      author,
+      title,
+      content,
+      publishDate,
+      edited,
+      editedDate,
+    });
     await newArticle.save();
     res.json({ message: "Article Created" });
   } catch (error) {

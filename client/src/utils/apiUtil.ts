@@ -23,7 +23,8 @@ async function uploadFileToS3(file: File): Promise<string> {
     headers: { "Content-Type": file.type },
   });
 
-  return url;
+  const publicUrl = `https://nz4wd-images.s3.ap-southeast-2.amazonaws.com/${file.name}`;
+  return publicUrl;
 }
 
 export { base64ToFile, uploadFileToS3 };

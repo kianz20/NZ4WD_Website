@@ -2,16 +2,20 @@ import mongoose, { Document, Schema } from "mongoose";
 
 interface Article extends Document {
   author: string;
+  title: string;
   content: string;
-  publishDate: Date;
+  readyToPublish: boolean;
+  publishDate: string;
   edited: boolean;
   editedDate?: Date;
 }
 
 const ArticleSchema: Schema<Article> = new Schema({
   author: { type: String, required: true },
+  title: { type: String, required: true },
   content: { type: String, required: true },
-  publishDate: { type: Date, required: true },
+  readyToPublish: { type: Boolean, required: true },
+  publishDate: { type: String, required: true },
   edited: { type: Boolean, required: false },
   editedDate: { type: Date, required: false },
 });

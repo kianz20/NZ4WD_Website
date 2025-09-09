@@ -71,17 +71,19 @@ const ArticleEditor = () => {
 
   const [formValues, setFormValues] = useState({
     publishDate: dayjs(),
+    title: "",
   });
 
-  const handleChange = (field: string, value: PickerValue) => {
+  const handleChange = (field: string, value: string | PickerValue) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
-    const { publishDate } = formValues;
+    const { publishDate, title } = formValues;
     const transformedData = {
       author: authorName!,
+      title: title,
       publishDate: publishDate?.toISOString(),
       content: getContent() || "",
     };
@@ -100,7 +102,7 @@ const ArticleEditor = () => {
       <form onSubmit={handleSave}>
         <TextField
           label="Author"
-          name="Author"
+          name="author"
           disabled
           value={authorName || ""}
         />
@@ -111,6 +113,12 @@ const ArticleEditor = () => {
             onChange={(newValue) => handleChange("publishDate", newValue)}
           />
         </LocalizationProvider>
+        <TextField
+          label="Title"
+          name="title"
+          value={formValues.title}
+          onChange={(e) => handleChange("title", e.target.value)}
+        />
         <br />
         {/* Dedicated toolbar container */}
         <div id="toolbar">

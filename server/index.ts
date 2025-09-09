@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 import articleRoutes from "./routes/article.ts";
 import userRoutes from "./routes/user.ts";
+import s3Routes from "./routes/s3.ts";
 
 dotenv.config();
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/articles", articleRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/s3-presign", s3Routes);
 
 mongoose
   .connect(process.env.MONGO_URI ?? "")
