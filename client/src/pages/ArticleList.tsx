@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { useNavigate } from "react-router-dom";
 
 interface ArticleGridRows {
   id: string;
@@ -17,6 +18,7 @@ const ArticleList = () => {
   const { userToken } = useRequireAuth();
   const { showToast } = useToast();
   const [rows, setRows] = useState<ArticleGridRows[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getArticles = async () => {
@@ -44,7 +46,7 @@ const ArticleList = () => {
   }, [showToast, userToken]);
 
   const handleEdit = (id: string) => {
-    console.log("Edit clicked for:", id);
+    navigate(`/articleEditor/${id}`);
   };
 
   const handleDelete = (id: string) => {

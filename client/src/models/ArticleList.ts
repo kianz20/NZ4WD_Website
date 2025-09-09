@@ -1,10 +1,11 @@
-export interface ArticleResponse {
+export interface ArticleListObject {
   author: string;
   title: string;
   readyToPublish: boolean;
   publishDate: string;
-  content: string;
   edited?: boolean;
   editedDate?: string;
   _id: string;
 }
+
+export type ArticleList = ArticleListObject[];

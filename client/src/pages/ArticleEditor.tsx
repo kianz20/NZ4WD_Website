@@ -8,7 +8,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Header, Navbar } from "../components";
+import { Header, LoadingSpinner, Navbar } from "../components";
 import Quill from "quill";
 import { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
@@ -16,14 +16,17 @@ import dayjs from "dayjs";
 import type { PickerValue } from "@mui/x-date-pickers/internals";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 const ArticleEditor = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
-
   const { authorName, userToken } = useRequireAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
@@ -78,6 +81,7 @@ const ArticleEditor = () => {
   };
 
   const [formValues, setFormValues] = useState({
+    author: "",
     publishDate: dayjs(),
     title: "",
     readyToPublish: false,
@@ -90,12 +94,35 @@ const ArticleEditor = () => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
+  useEffect(() => {
+    if (authorName) {
+      setFormValues((prev) => ({ ...prev, author: authorName }));
+    }
+  }, [authorName]);
+
+  useEffect(() => {
+    if (id && userToken) {
+      api.getArticleEdit(userToken, id).then((data) => {
+        setFormValues({
+          author: data.author,
+          publishDate: dayjs(data.publishDate),
+          readyToPublish: data.readyToPublish,
+          title: data.title,
+        });
+        if (quillRef.current && data.content) {
+          quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
+        }
+      });
+    }
+  }, [id, userToken]);
+
   const handleSave = async (event: React.FormEvent) => {
+    setLoading(true);
     if (userToken) {
       event.preventDefault();
-      const { publishDate, title, readyToPublish } = formValues;
+      const { author, publishDate, title, readyToPublish } = formValues;
       const transformedData = {
-        author: authorName!,
+        author: author,
         title: title,
         readyToPublish: readyToPublish,
         publishDate: publishDate?.toISOString(),
@@ -107,12 +134,15 @@ const ArticleEditor = () => {
         navigate("/articleList");
       } catch {
         showToast("Save failed", "error");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
   return (
     <>
+      <LoadingSpinner open={loading} />
       <Header />
       <Navbar />
       <Typography variant="h4" component="h1">
@@ -123,8 +153,8 @@ const ArticleEditor = () => {
         <TextField
           label="Author"
           name="author"
-          disabled
-          value={authorName || ""}
+          value={formValues.author}
+          onChange={(e) => handleChange("author", e.target.value)}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
@@ -167,7 +197,9 @@ const ArticleEditor = () => {
           label="Ready to Publish"
         />
         <br />
-        <Button type="submit">Submit</Button>
+        <Button variant="outlined" type="submit">
+          Save
+        </Button>
       </form>
     </>
   );
