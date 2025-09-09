@@ -7,3 +7,4 @@ export { default as ContactUs } from "./ContactUs";
 export { default as Home } from "./Home";
 export { default as LatestNews } from "./LatestNews";
 export { default as Reviews } from "./Reviews";
+export { default as ArticleList } from "./ArticleList";

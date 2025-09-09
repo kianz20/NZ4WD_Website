@@ -1,9 +1,10 @@
 import express from "express";
 import Article from "../models/Article.ts";
+import authenticateToken from "../middleware/auth.ts";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   try {
     const {
       author,
@@ -36,6 +37,15 @@ router.post("/", async (req, res) => {
         error: error.message,
       });
     }
+  }
+});
+
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const articles = await Article.find();
+    res.status(200).json(articles);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch articles" + error });
   }
 });
 

@@ -12,15 +12,18 @@ import { Header, Navbar } from "../components";
 import Quill from "quill";
 import { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
-import { useAuth } from "../hooks";
 import dayjs from "dayjs";
 import type { PickerValue } from "@mui/x-date-pickers/internals";
 import * as api from "../api/articleController";
+import { useRequireAuth, useToast } from "../hooks";
+import { useNavigate } from "react-router-dom";
 const ArticleEditor = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
 
-  const { authorName } = useAuth();
+  const { authorName, userToken } = useRequireAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
@@ -88,17 +91,24 @@ const ArticleEditor = () => {
   };
 
   const handleSave = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const { publishDate, title, readyToPublish } = formValues;
-    const transformedData = {
-      author: authorName!,
-      title: title,
-      readyToPublish: readyToPublish,
-      publishDate: publishDate?.toISOString(),
-      content: getContent() || "",
-    };
-
-    await api.createArticle(transformedData);
+    if (userToken) {
+      event.preventDefault();
+      const { publishDate, title, readyToPublish } = formValues;
+      const transformedData = {
+        author: authorName!,
+        title: title,
+        readyToPublish: readyToPublish,
+        publishDate: publishDate?.toISOString(),
+        content: getContent() || "",
+      };
+      try {
+        await api.createArticle(transformedData, userToken);
+        showToast("Article Saved", "success");
+        navigate("/articleList");
+      } catch {
+        showToast("Save failed", "error");
+      }
+    }
   };
 
   return (
@@ -159,8 +169,6 @@ const ArticleEditor = () => {
         <br />
         <Button type="submit">Submit</Button>
       </form>
-
-      <button onClick={getContent}>Get Content</button>
     </>
   );
 };

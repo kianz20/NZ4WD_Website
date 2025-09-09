@@ -27,4 +27,31 @@ async function uploadFileToS3(file: File): Promise<string> {
   return publicUrl;
 }
 
-export { base64ToFile, uploadFileToS3 };
+async function replaceBase64ImagesWithS3(
+  html: string,
+  articleTitle: string
+): Promise<string> {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const images = Array.from(doc.querySelectorAll("img"));
+  const safeArticleTitle = articleTitle
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9-_]/g, "");
+
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i];
+    const src = img.getAttribute("src");
+    if (src && src.startsWith("data:image/")) {
+      const file = base64ToFile(
+        src,
+        `${safeArticleTitle}-${Date.now()}-${i}.png`
+      );
+      const s3Url = await uploadFileToS3(file);
+      img.setAttribute("src", s3Url);
+    }
+  }
+
+  return doc.body.innerHTML;
+}
+
+export { base64ToFile, uploadFileToS3, replaceBase64ImagesWithS3 };

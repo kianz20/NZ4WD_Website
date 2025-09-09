@@ -46,7 +46,7 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
       console.error("Login failed:", err.message, "Status:", err.status);
       setError(true);
       if (err.status === 401) {
-        showToast("Username or Password is incorrect", undefined, "error");
+        showToast("Username or Password is incorrect", "error");
       }
     }
   };

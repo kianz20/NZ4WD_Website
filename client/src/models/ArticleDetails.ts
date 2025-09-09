@@ -1,4 +1,4 @@
-export interface ArticleBody {
+export interface ArticleDetails {
   author: string;
   title: string;
   readyToPublish: boolean;

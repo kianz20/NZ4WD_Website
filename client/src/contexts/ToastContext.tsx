@@ -4,8 +4,8 @@ import { Snackbar, Alert } from "@mui/material";
 export interface ToastData {
   showToast: (
     message: string,
-    hideDuration?: number,
-    severity?: "success" | "error" | "info" | "warning"
+    severity?: "success" | "error" | "info" | "warning",
+    hideDuration?: number
   ) => void;
 }
 
@@ -21,8 +21,8 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const showToast = (
     msg: string,
-    dur: number = 3000,
-    sev: "success" | "error" | "info" | "warning" = "info"
+    sev: "success" | "error" | "info" | "warning" = "info",
+    dur: number = 3000
   ) => {
     setMessage(msg);
     setDuration(dur);
