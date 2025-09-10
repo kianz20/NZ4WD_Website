@@ -119,4 +119,27 @@ router.get("/getEditDetails/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.delete("/delete/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+    const query = { _id: id.toString() };
+    const deletedArticle = await Article.findOneAndDelete(query);
+    if (!deletedArticle) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+    res.status(200).json({
+      message: "Article deleted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "An unexpected error occurred" });
+    }
+  }
+});
+
 export default router;

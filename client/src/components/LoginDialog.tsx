@@ -10,7 +10,6 @@ import type { LoginBody, LoginError, LoginResponse } from "../models";
 import { useState } from "react";
 import * as api from "../api/userController";
 import { useAuth, useToast } from "../hooks";
-
 interface LoginDialogProps {
   open: boolean;
   onClose: () => void;
@@ -19,22 +18,15 @@ interface LoginDialogProps {
 const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
   const { setUserCookies } = useAuth();
   const { showToast } = useToast();
-
   const [loginBody, setLoginBody] = useState<LoginBody>({
     username: "",
     password: "",
   });
-
   const [error, setError] = useState(false);
-
   const handleFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setLoginBody((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setLoginBody((prevState) => ({ ...prevState, [name]: value }));
   };
-
   const handleLogin = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     try {
@@ -50,13 +42,11 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
       }
     }
   };
-
   const handleClose = () => {
     setError(false);
     setLoginBody({ username: "", password: "" });
     onClose();
   };
-
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Editor Login</DialogTitle>
@@ -96,5 +86,4 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
     </Dialog>
   );
 };
-
 export default LoginDialog;

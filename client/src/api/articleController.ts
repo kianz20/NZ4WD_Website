@@ -101,3 +101,23 @@ export const getArticleEdit = async (
   const data: ArticleDetails = await response.json();
   return data;
 };
+
+export const deleteArticle = async (
+  token: string,
+  id: string
+): Promise<ArticleOut> => {
+  const response = await fetch(`${BACKEND_URL}/api/articles/delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete article: ${response.statusText}`);
+  }
+
+  const data: ArticleOut = await response.json();
+  return data;
+};

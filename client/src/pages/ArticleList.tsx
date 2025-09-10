@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Typography } from "@mui/material";
-import { Header, Navbar } from "../components";
+import { ConfirmDialog, Header, LoadingSpinner, Navbar } from "../components";
 import { useEffect, useState } from "react";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
@@ -20,10 +20,38 @@ const ArticleList = () => {
   const [rows, setRows] = useState<ArticleGridRows[]>([]);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+
+  const handleDelete = (id: string, title: string) => {
+    setDeleteTarget({ id, title });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget || !userToken) return;
+
+    setLoading(true);
+    try {
+      await api.deleteArticle(userToken, deleteTarget.id);
+      showToast("Article Successfully Deleted", "success");
+      setRows(rows.filter((row) => row.id !== deleteTarget.id));
+    } catch {
+      showToast("Failed to delete article", "error");
+    } finally {
+      setLoading(false);
+      setDeleteTarget(null);
+    }
+  };
+
   useEffect(() => {
     const getArticles = async () => {
-      try {
-        if (userToken) {
+      if (userToken) {
+        setLoading(true);
+        try {
           const response = await api.getArticles(userToken);
           setRows(
             response.map((article) => {
@@ -37,9 +65,11 @@ const ArticleList = () => {
               };
             })
           );
+        } catch {
+          showToast("failed to get articles", "error");
+        } finally {
+          setLoading(false);
         }
-      } catch {
-        showToast("failed to get articles", "error");
       }
     };
     getArticles();
@@ -47,10 +77,6 @@ const ArticleList = () => {
 
   const handleEdit = (id: string) => {
     navigate(`/articleEditor/${id}`);
-  };
-
-  const handleDelete = (id: string) => {
-    console.log("Delete clicked for:", id);
   };
 
   const columns: GridColDef[] = [
@@ -84,7 +110,9 @@ const ArticleList = () => {
       renderCell: (params) => (
         <Box display="flex" flexDirection={"row"} sx={{ height: "100%" }}>
           <Button onClick={() => handleEdit(params.id.toString())}>Edit</Button>
-          <Button onClick={() => handleDelete(params.id.toString())}>
+          <Button
+            onClick={() => handleDelete(params.id.toString(), params.row.title)}
+          >
             Delete
           </Button>
         </Box>
@@ -94,6 +122,7 @@ const ArticleList = () => {
 
   return (
     <>
+      <LoadingSpinner open={loading} />
       <Header />
       <Navbar />
       <Typography variant="h4" component="h1">
@@ -107,6 +136,18 @@ const ArticleList = () => {
           disableRowSelectionOnClick
         />
       </Box>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Article"
+        children={
+          <Typography>
+            Are you sure you want to delete {deleteTarget?.title}
+          </Typography>
+        }
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+      />
     </>
   );
 };

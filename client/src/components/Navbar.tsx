@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Box, Button, Divider } from "@mui/material";
 import styles from "../styles/Navbar.module.css";
-import LoginDialog from "./LoginDialog";
+import { LoginDialog } from "../components";
 import { useAuth } from "../hooks";
 import { UserMenu } from ".";
 

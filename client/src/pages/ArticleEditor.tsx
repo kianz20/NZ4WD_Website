@@ -13,10 +13,16 @@ import Quill from "quill";
 import { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
 import dayjs from "dayjs";
-import type { PickerValue } from "@mui/x-date-pickers/internals";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
+
+type FormValues = {
+  author: string;
+  publishDate: dayjs.Dayjs | null;
+  title: string;
+  readyToPublish: boolean;
+};
 
 const ArticleEditor = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -80,16 +86,16 @@ const ArticleEditor = () => {
     }
   };
 
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<FormValues>({
     author: "",
     publishDate: dayjs(),
     title: "",
     readyToPublish: false,
   });
 
-  const handleChange = (
-    field: string,
-    value: string | PickerValue | boolean
+  const handleChange = <K extends keyof FormValues>(
+    field: K,
+    value: FormValues[K]
   ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
@@ -102,30 +108,42 @@ const ArticleEditor = () => {
 
   useEffect(() => {
     if (id && userToken) {
-      api.getArticleEdit(userToken, id).then((data) => {
-        setFormValues({
-          author: data.author,
-          publishDate: dayjs(data.publishDate),
-          readyToPublish: data.readyToPublish,
-          title: data.title,
+      setLoading(true);
+      api
+        .getArticleEdit(userToken, id)
+        .then((data) => {
+          setFormValues({
+            author: data.author,
+            publishDate: dayjs(data.publishDate),
+            readyToPublish: data.readyToPublish,
+            title: data.title,
+          });
+          if (quillRef.current && data.content) {
+            quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
+          }
+        })
+        .catch(() => {
+          showToast("Failed to load article", "error");
+        })
+        .finally(() => {
+          setLoading(false);
         });
-        if (quillRef.current && data.content) {
-          quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
-        }
-      });
     }
-  }, [id, userToken]);
+  }, [id, userToken, showToast]);
 
   const handleSave = async (event: React.FormEvent) => {
-    setLoading(true);
     if (userToken) {
+      setLoading(true);
+
       event.preventDefault();
       const { author, publishDate, title, readyToPublish } = formValues;
       const transformedData = {
         author: author,
         title: title,
         readyToPublish: readyToPublish,
-        publishDate: publishDate?.toISOString(),
+        publishDate: publishDate
+          ? publishDate.toISOString()
+          : new Date().toISOString(),
         content: getContent() || "",
       };
       try {
