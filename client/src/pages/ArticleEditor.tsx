@@ -20,7 +20,8 @@ import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import Cropper, { type Area } from "react-easy-crop";
-import { getCroppedImg } from "../utils/pageUtils";
+import { downloadImageFromS3, getCroppedImg } from "../utils/pageUtils";
+import { s3prefix } from "../constants/s3Prefix";
 
 type FormValues = {
   author: string;
@@ -29,6 +30,11 @@ type FormValues = {
   readyToPublish: boolean;
   tags: string[];
 };
+
+function getFileExtensionFromKey(key: string) {
+  const match = key.match(/\.(\w+)$/);
+  return match ? match[1] : "png"; // default to png if no extension
+}
 
 const ArticleEditor = () => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -45,6 +51,9 @@ const ArticleEditor = () => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [loadedThumbnailURL, setLoadedThumbnailURL] = useState<
+    string | undefined
+  >();
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
@@ -132,6 +141,7 @@ const ArticleEditor = () => {
             title: data.title,
             tags: data.tags,
           });
+          setLoadedThumbnailURL(data.thumbnail);
           if (quillRef.current && data.content) {
             quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
           }
@@ -152,18 +162,26 @@ const ArticleEditor = () => {
 
       event.preventDefault();
       const { author, publishDate, title, readyToPublish, tags } = formValues;
+
       let croppedThumbnail;
-      if (thumbnailFile && croppedAreaPixels) {
-        croppedThumbnail = await getCroppedImg(
-          thumbnailPreview!,
-          croppedAreaPixels
-        );
+
+      if (!loadedThumbnailURL) {
+        if (thumbnailFile && croppedAreaPixels) {
+          croppedThumbnail = await getCroppedImg(
+            thumbnailPreview!,
+            croppedAreaPixels
+          );
+        }
       }
-      console.log(croppedThumbnail);
+
+      const thumbnailToUse = loadedThumbnailURL
+        ? loadedThumbnailURL
+        : croppedThumbnail ?? undefined;
+
       const transformedData = {
         author: author,
         title: title,
-        thumbnail: croppedThumbnail ?? undefined,
+        thumbnail: thumbnailToUse,
         readyToPublish: readyToPublish,
         publishDate: publishDate ? publishDate.toDate() : new Date(),
         content: getContent() || "",
@@ -237,62 +255,87 @@ const ArticleEditor = () => {
           }
           label="Ready to Publish"
         />
-        <Box mb={2}>
-          <Button variant="contained" component="label">
-            Upload Thumbnail
-            <input
-              hidden
-              accept="image/*"
-              type="file"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  const file = e.target.files[0];
-                  setThumbnailFile(file);
-                  setThumbnailPreview(URL.createObjectURL(file));
-                }
+        {loadedThumbnailURL ? (
+          <>
+            <Box component="img" src={loadedThumbnailURL} />
+            <Button
+              onClick={() => {
+                setLoadedThumbnailURL(undefined);
               }}
-            />
-          </Button>
-        </Box>
-        {thumbnailPreview && (
-          <Box
-            mb={2}
-            sx={{
-              position: "relative",
-              width: 500,
-              height: 300,
-              bgcolor: "#333",
-              borderRadius: 1,
-              overflow: "hidden",
-            }}
-          >
-            <Cropper
-              image={thumbnailPreview}
-              crop={crop}
-              zoom={zoom}
-              aspect={5 / 3}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={(_, croppedPixels) =>
-                setCroppedAreaPixels(croppedPixels)
-              }
-            />
-          </Box>
-        )}
-
-        {/* Zoom Slider */}
-        {thumbnailPreview && (
-          <Box mb={2}>
-            <Slider
-              value={zoom}
-              min={1}
-              max={3}
-              step={0.1}
-              onChange={(_, value) => setZoom(value as number)}
-              valueLabelDisplay="auto"
-              marks
-            />
-          </Box>
+            >
+              Remove
+            </Button>
+            <Button
+              onClick={() => {
+                const extension = getFileExtensionFromKey(loadedThumbnailURL);
+                downloadImageFromS3(
+                  loadedThumbnailURL.replace(s3prefix, ""),
+                  `${formValues.title} article thumbnail.${extension}`
+                );
+              }}
+            >
+              Download
+            </Button>
+          </>
+        ) : (
+          <>
+            <Box mb={2}>
+              <Button variant="contained" component="label">
+                Upload Thumbnail
+                <input
+                  hidden
+                  accept="image/*"
+                  type="file"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      const file = e.target.files[0];
+                      setThumbnailFile(file);
+                      setThumbnailPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              </Button>
+            </Box>
+            {thumbnailPreview && (
+              <Box
+                mb={2}
+                sx={{
+                  position: "relative",
+                  width: 500,
+                  height: 300,
+                  bgcolor: "#333",
+                  borderRadius: 1,
+                  overflow: "hidden",
+                }}
+              >
+                <Cropper
+                  image={thumbnailPreview}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={5 / 3}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, croppedPixels) =>
+                    setCroppedAreaPixels(croppedPixels)
+                  }
+                />
+              </Box>
+            )}
+            {/* Zoom Slider */}
+            {thumbnailPreview && (
+              <Box mb={2}>
+                <Slider
+                  value={zoom}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  onChange={(_, value) => setZoom(value as number)}
+                  valueLabelDisplay="auto"
+                  marks
+                />
+              </Box>
+            )}
+          </>
         )}
 
         <br />

@@ -63,16 +63,12 @@ export const updateArticle = async (
 
   let updatedThumbail;
 
-  console.log(article.thumbnail);
-
   if (article.thumbnail) {
     updatedThumbail = await replaceThumbnailImageWithS3(
       article.thumbnail,
       article.title
     );
   }
-
-  console.log(updatedThumbail);
 
   const updatedArticle: ArticleCreateIn = {
     ...article,
