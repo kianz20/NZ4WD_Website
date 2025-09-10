@@ -1,8 +1,10 @@
 import {
   Autocomplete,
+  Box,
   Button,
   Checkbox,
   FormControlLabel,
+  Slider,
   TextField,
   Typography,
 } from "@mui/material";
@@ -17,6 +19,8 @@ import dayjs from "dayjs";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
+import Cropper, { type Area } from "react-easy-crop";
+import { getCroppedImg } from "../utils/pageUtils";
 
 type FormValues = {
   author: string;
@@ -35,6 +39,12 @@ const ArticleEditor = () => {
   const { id } = useParams<{ id: string }>();
 
   const [loading, setLoading] = useState(false);
+
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
@@ -133,7 +143,8 @@ const ArticleEditor = () => {
           setLoading(false);
         });
     }
-  }, [id, userToken, showToast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, userToken]);
 
   const handleSave = async (event: React.FormEvent) => {
     if (userToken) {
@@ -141,9 +152,18 @@ const ArticleEditor = () => {
 
       event.preventDefault();
       const { author, publishDate, title, readyToPublish, tags } = formValues;
+      let croppedThumbnail;
+      if (thumbnailFile && croppedAreaPixels) {
+        croppedThumbnail = await getCroppedImg(
+          thumbnailPreview!,
+          croppedAreaPixels
+        );
+      }
+      console.log(croppedThumbnail);
       const transformedData = {
         author: author,
         title: title,
+        thumbnail: croppedThumbnail ?? undefined,
         readyToPublish: readyToPublish,
         publishDate: publishDate ? publishDate.toDate() : new Date(),
         content: getContent() || "",
@@ -217,6 +237,64 @@ const ArticleEditor = () => {
           }
           label="Ready to Publish"
         />
+        <Box mb={2}>
+          <Button variant="contained" component="label">
+            Upload Thumbnail
+            <input
+              hidden
+              accept="image/*"
+              type="file"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  const file = e.target.files[0];
+                  setThumbnailFile(file);
+                  setThumbnailPreview(URL.createObjectURL(file));
+                }
+              }}
+            />
+          </Button>
+        </Box>
+        {thumbnailPreview && (
+          <Box
+            mb={2}
+            sx={{
+              position: "relative",
+              width: 500,
+              height: 300,
+              bgcolor: "#333",
+              borderRadius: 1,
+              overflow: "hidden",
+            }}
+          >
+            <Cropper
+              image={thumbnailPreview}
+              crop={crop}
+              zoom={zoom}
+              aspect={5 / 3}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(_, croppedPixels) =>
+                setCroppedAreaPixels(croppedPixels)
+              }
+            />
+          </Box>
+        )}
+
+        {/* Zoom Slider */}
+        {thumbnailPreview && (
+          <Box mb={2}>
+            <Slider
+              value={zoom}
+              min={1}
+              max={3}
+              step={0.1}
+              onChange={(_, value) => setZoom(value as number)}
+              valueLabelDisplay="auto"
+              marks
+            />
+          </Box>
+        )}
+
         <br />
 
         <div id="toolbar">

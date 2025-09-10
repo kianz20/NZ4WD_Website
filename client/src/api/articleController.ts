@@ -5,19 +5,33 @@ import type {
   ArticleList,
   ArticleOut,
 } from "../models";
-import { replaceBase64ImagesWithS3 } from "../utils/apiUtil";
+import {
+  replaceContentImagesWithS3,
+  replaceThumbnailImageWithS3,
+} from "../utils/apiUtil";
 
 export const createArticle = async (
   article: ArticleCreateIn,
   token: string
 ): Promise<ArticleOut> => {
-  const updatedContent = await replaceBase64ImagesWithS3(
+  const updatedContent = await replaceContentImagesWithS3(
     article.content,
     article.title
   );
+
+  let updatedThumbail;
+
+  if (article.thumbnail) {
+    updatedThumbail = await replaceThumbnailImageWithS3(
+      article.thumbnail,
+      article.title
+    );
+  }
+
   const updatedArticle: ArticleCreateIn = {
     ...article,
     content: updatedContent,
+    thumbnail: article.thumbnail ? updatedThumbail : undefined,
   };
 
   const response = await fetch(`${BACKEND_URL}/api/articles/`, {
@@ -42,13 +56,28 @@ export const updateArticle = async (
   article: ArticleCreateIn,
   token: string
 ): Promise<ArticleOut> => {
-  const updatedContent = await replaceBase64ImagesWithS3(
+  const updatedContent = await replaceContentImagesWithS3(
     article.content,
     article.title
   );
+
+  let updatedThumbail;
+
+  console.log(article.thumbnail);
+
+  if (article.thumbnail) {
+    updatedThumbail = await replaceThumbnailImageWithS3(
+      article.thumbnail,
+      article.title
+    );
+  }
+
+  console.log(updatedThumbail);
+
   const updatedArticle: ArticleCreateIn = {
     ...article,
     content: updatedContent,
+    thumbnail: article.thumbnail ? updatedThumbail : undefined,
   };
 
   const response = await fetch(`${BACKEND_URL}/api/articles/${id}`, {

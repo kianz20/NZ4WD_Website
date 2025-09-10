@@ -1,12 +1,24 @@
 import express from "express";
 import Article from "../models/Article.ts";
 import authenticateToken from "../middleware/auth.ts";
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  DeleteObjectsCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { JSDOM } from "jsdom";
+import { fromEnv } from "@aws-sdk/credential-providers";
 
 const router = express.Router();
+const bucket = process.env.REACT_APP_S3_BUCKET || "nz4wd-images";
+const prefix =
+  process.env.REACT_APP_S3_PREFIX ||
+  `https://${bucket}.s3.ap-southeast-2.amazonaws.com/`;
 
-const s3 = new S3Client({ region: "ap-southeast-2" });
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: fromEnv(),
+});
 
 router.post("/", authenticateToken, async (req, res) => {
   try {
@@ -18,6 +30,7 @@ router.post("/", authenticateToken, async (req, res) => {
       publishDate,
       editedDate,
       tags,
+      thumbnail,
     } = req.body;
 
     if (!author || !content) {
@@ -32,6 +45,7 @@ router.post("/", authenticateToken, async (req, res) => {
       readyToPublish,
       editedDate,
       tags,
+      thumbnail,
     });
     await newArticle.save();
     res.json({ message: "Article Created" });
@@ -53,15 +67,32 @@ router.put("/:id", authenticateToken, async (req, res) => {
       content,
       readyToPublish,
       publishDate,
-      editedDate,
       tags,
+      thumbnail,
     } = req.body;
 
     if (!author || !content) {
       return res.status(400).json({ error: "Author and Content are required" });
     }
 
-    const query = { _id: id.toString() };
+    const articleToEdit = await Article.findById(id);
+
+    if (!articleToEdit) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+
+    if (articleToEdit.thumbnail && articleToEdit.thumbnail !== thumbnail) {
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: bucket,
+            Key: articleToEdit.thumbnail.replace(prefix, ""),
+          })
+        );
+      } catch (s3Error) {
+        console.error("Failed to delete old thumbnail:", s3Error);
+      }
+    }
 
     const update = {
       $set: {
@@ -71,23 +102,14 @@ router.put("/:id", authenticateToken, async (req, res) => {
         readyToPublish: readyToPublish,
         publishDate: publishDate,
         edited: true,
-        editedDate: editedDate,
         tags: tags,
+        thumbnail: thumbnail,
       },
     };
 
-    const options = { new: true };
-    const updatedArticle = await Article.findOneAndUpdate(
-      query,
-      update,
-      options
-    );
-
-    if (!updatedArticle) {
-      return res
-        .status(404)
-        .json({ error: "Article ID does not match a product" });
-    }
+    await Article.findByIdAndUpdate(id, update, {
+      new: true,
+    });
 
     res.json({ message: "Article Updated" });
   } catch (error) {
@@ -137,21 +159,29 @@ router.delete("/delete/:id", authenticateToken, async (req, res) => {
     }
 
     const dom = new JSDOM(articleToDelete.content);
-    const imageURLs = Array.from(
-      dom.window.document.querySelectorAll("img")
-    ).map((img) => img.src);
+    const { document, HTMLImageElement } = dom.window;
+    const imageURLs = Array.from(document.querySelectorAll("img"))
+      .filter(
+        (el): el is InstanceType<typeof HTMLImageElement> =>
+          el instanceof HTMLImageElement
+      )
+      .map((img) => img.src);
 
-    const bucket = "nz4wd-images";
-    const prefix = `https://${bucket}.s3.ap-southeast-2.amazonaws.com/`;
     const keys = imageURLs
       .filter((url) => url.startsWith(prefix))
       .map((url) => url.replace(prefix, ""));
 
-    await Promise.all(
-      keys.map((key) =>
-        s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
-      )
-    );
+    if (keys.length > 0) {
+      await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: bucket,
+          Delete: {
+            Objects: keys.map((Key) => ({ Key })),
+            Quiet: true,
+          },
+        })
+      );
+    }
 
     await Article.findByIdAndDelete(id);
 

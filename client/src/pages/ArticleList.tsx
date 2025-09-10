@@ -123,7 +123,8 @@ const ArticleList = () => {
       }
     };
     getArticles();
-  }, [showToast, userToken]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userToken]);
 
   const handleEdit = (id: string) => {
     navigate(`/articleEditor/${id}`);

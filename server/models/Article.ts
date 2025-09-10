@@ -4,6 +4,7 @@ interface Article extends Document {
   author: string;
   title: string;
   content: string;
+  thumbnail: string;
   tags: string[];
   readyToPublish: boolean;
   publishDate: Date;
@@ -16,6 +17,7 @@ const ArticleSchema: Schema<Article> = new Schema(
     author: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
+    thumbnail: { type: String },
     tags: { type: [String], default: [] },
     readyToPublish: { type: Boolean, required: true },
     publishDate: { type: Date, required: true },

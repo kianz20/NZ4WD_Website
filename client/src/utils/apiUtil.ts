@@ -27,7 +27,7 @@ async function uploadFileToS3(file: File): Promise<string> {
   return publicUrl;
 }
 
-async function replaceBase64ImagesWithS3(
+async function replaceContentImagesWithS3(
   html: string,
   articleTitle: string
 ): Promise<string> {
@@ -54,4 +54,25 @@ async function replaceBase64ImagesWithS3(
   return doc.body.innerHTML;
 }
 
-export { base64ToFile, uploadFileToS3, replaceBase64ImagesWithS3 };
+async function replaceThumbnailImageWithS3(
+  image: string,
+  articleTitle: string
+): Promise<string> {
+  const safeArticleTitle = articleTitle
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9-_]/g, "");
+
+  const file = base64ToFile(
+    image,
+    `${safeArticleTitle}-Thumbnail-${Date.now()}.png`
+  );
+  const s3Url = await uploadFileToS3(file);
+  return s3Url;
+}
+
+export {
+  base64ToFile,
+  uploadFileToS3,
+  replaceContentImagesWithS3,
+  replaceThumbnailImageWithS3,
+};
