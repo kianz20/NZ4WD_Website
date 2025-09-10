@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Button,
   Checkbox,
   FormControlLabel,
@@ -22,6 +23,7 @@ type FormValues = {
   publishDate: dayjs.Dayjs | null;
   title: string;
   readyToPublish: boolean;
+  tags: string[];
 };
 
 const ArticleEditor = () => {
@@ -91,6 +93,7 @@ const ArticleEditor = () => {
     publishDate: dayjs(),
     title: "",
     readyToPublish: false,
+    tags: [],
   });
 
   const handleChange = <K extends keyof FormValues>(
@@ -117,6 +120,7 @@ const ArticleEditor = () => {
             publishDate: dayjs(data.publishDate),
             readyToPublish: data.readyToPublish,
             title: data.title,
+            tags: data.tags,
           });
           if (quillRef.current && data.content) {
             quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
@@ -136,15 +140,14 @@ const ArticleEditor = () => {
       setLoading(true);
 
       event.preventDefault();
-      const { author, publishDate, title, readyToPublish } = formValues;
+      const { author, publishDate, title, readyToPublish, tags } = formValues;
       const transformedData = {
         author: author,
         title: title,
         readyToPublish: readyToPublish,
-        publishDate: publishDate
-          ? publishDate.toISOString()
-          : new Date().toISOString(),
+        publishDate: publishDate ? publishDate.toDate() : new Date(),
         content: getContent() || "",
+        tags: tags,
       };
       try {
         if (id) {
@@ -194,6 +197,28 @@ const ArticleEditor = () => {
           onChange={(e) => handleChange("title", e.target.value)}
         />
         <br />
+        <br />
+        <Autocomplete
+          multiple
+          freeSolo
+          options={[]}
+          value={formValues.tags}
+          onChange={(_, newValue) => handleChange("tags", newValue)}
+          renderInput={(params) => <TextField {...params} label="Tags" />}
+        />
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="readyToPublish"
+              checked={formValues.readyToPublish} // use checked instead of value
+              onChange={(e) => handleChange("readyToPublish", e.target.checked)}
+            />
+          }
+          label="Ready to Publish"
+        />
+        <br />
+
         <div id="toolbar">
           <button className="ql-bold" />
           <button className="ql-italic" />
@@ -209,16 +234,6 @@ const ArticleEditor = () => {
 
         <div ref={editorRef} style={{ height: 400 }} />
 
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="readyToPublish"
-              checked={formValues.readyToPublish} // use checked instead of value
-              onChange={(e) => handleChange("readyToPublish", e.target.checked)}
-            />
-          }
-          label="Ready to Publish"
-        />
         <br />
         <Button variant="outlined" type="submit">
           Save

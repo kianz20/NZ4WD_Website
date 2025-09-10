@@ -5,6 +5,7 @@ export interface ArticleListObject {
   publishDate: string;
   edited?: boolean;
   editedDate?: string;
+  archived?: boolean;
   _id: string;
 }
 

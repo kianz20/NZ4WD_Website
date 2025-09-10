@@ -24,6 +24,7 @@ const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     sev: "success" | "error" | "info" | "warning" = "info",
     dur: number = 3000
   ) => {
+    setOpen(false);
     setMessage(msg);
     setDuration(dur);
     setSeverity(sev);

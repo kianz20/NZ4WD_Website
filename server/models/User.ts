@@ -9,12 +9,15 @@ interface IUser extends Document {
 }
 
 // Mongoose schema for the User model
-const UserSchema: Schema<IUser> = new Schema({
-  username: { type: String, required: true },
-  password: { type: String, required: true },
-  authorName: { type: String, required: true },
-  role: { type: String, required: true },
-});
+const UserSchema: Schema<IUser> = new Schema(
+  {
+    username: { type: String, required: true },
+    password: { type: String, required: true },
+    authorName: { type: String, required: true },
+    role: { type: String, required: true },
+  },
+  { timestamps: true }
+);
 
 const User = mongoose.model<IUser>("User", UserSchema);
 

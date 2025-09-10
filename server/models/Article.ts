@@ -4,21 +4,26 @@ interface Article extends Document {
   author: string;
   title: string;
   content: string;
+  tags: string[];
   readyToPublish: boolean;
-  publishDate: string;
+  publishDate: Date;
   edited: boolean;
-  editedDate?: Date;
+  archived: boolean;
 }
 
-const ArticleSchema: Schema<Article> = new Schema({
-  author: { type: String, required: true },
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  readyToPublish: { type: Boolean, required: true },
-  publishDate: { type: String, required: true },
-  edited: { type: Boolean, required: false },
-  editedDate: { type: Date, required: false },
-});
+const ArticleSchema: Schema<Article> = new Schema(
+  {
+    author: { type: String, required: true },
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    tags: { type: [String], default: [] },
+    readyToPublish: { type: Boolean, required: true },
+    publishDate: { type: Date, required: true },
+    archived: { type: Boolean, default: false },
+    edited: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
 
 const Article = mongoose.model<Article>("Article", ArticleSchema);
 

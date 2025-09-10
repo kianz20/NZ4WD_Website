@@ -1,8 +1,12 @@
 import express from "express";
 import Article from "../models/Article.ts";
 import authenticateToken from "../middleware/auth.ts";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { JSDOM } from "jsdom";
 
 const router = express.Router();
+
+const s3 = new S3Client({ region: "ap-southeast-2" });
 
 router.post("/", authenticateToken, async (req, res) => {
   try {
@@ -12,8 +16,8 @@ router.post("/", authenticateToken, async (req, res) => {
       content,
       readyToPublish,
       publishDate,
-      edited,
       editedDate,
+      tags,
     } = req.body;
 
     if (!author || !content) {
@@ -26,8 +30,8 @@ router.post("/", authenticateToken, async (req, res) => {
       content,
       publishDate,
       readyToPublish,
-      edited,
       editedDate,
+      tags,
     });
     await newArticle.save();
     res.json({ message: "Article Created" });
@@ -49,8 +53,8 @@ router.put("/:id", authenticateToken, async (req, res) => {
       content,
       readyToPublish,
       publishDate,
-      edited,
       editedDate,
+      tags,
     } = req.body;
 
     if (!author || !content) {
@@ -66,8 +70,9 @@ router.put("/:id", authenticateToken, async (req, res) => {
         content: content,
         readyToPublish: readyToPublish,
         publishDate: publishDate,
-        edited: edited,
+        edited: true,
         editedDate: editedDate,
+        tags: tags,
       },
     };
 
@@ -125,13 +130,70 @@ router.delete("/delete/:id", authenticateToken, async (req, res) => {
     if (!id) {
       return res.status(400).json({ error: "ID is required" });
     }
-    const query = { _id: id.toString() };
-    const deletedArticle = await Article.findOneAndDelete(query);
-    if (!deletedArticle) {
+    const articleToDelete = await Article.findById(id);
+
+    if (!articleToDelete) {
       return res.status(404).json({ error: "Article not found" });
     }
+
+    const dom = new JSDOM(articleToDelete.content);
+    const imageURLs = Array.from(
+      dom.window.document.querySelectorAll("img")
+    ).map((img) => img.src);
+
+    const bucket = "nz4wd-images";
+    const prefix = `https://${bucket}.s3.ap-southeast-2.amazonaws.com/`;
+    const keys = imageURLs
+      .filter((url) => url.startsWith(prefix))
+      .map((url) => url.replace(prefix, ""));
+
+    await Promise.all(
+      keys.map((key) =>
+        s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
+      )
+    );
+
+    await Article.findByIdAndDelete(id);
+
     res.status(200).json({
       message: "Article deleted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "An unexpected error occurred" });
+    }
+  }
+});
+
+router.put("/archive/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { archive } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+
+    if (typeof archive !== "boolean") {
+      return res
+        .status(400)
+        .json({ error: "Archive value must be true or false" });
+    }
+
+    const updatedArticle = await Article.findByIdAndUpdate(
+      id,
+      { archived: archive },
+      { new: true } // return the updated document
+    );
+
+    if (!updatedArticle) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+
+    res.status(200).json({
+      message: `Article ${archive ? "archived" : "unarchived"} successfully`,
     });
   } catch (error) {
     if (error instanceof Error) {

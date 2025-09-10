@@ -1,16 +1,21 @@
 import { BACKEND_URL } from "../constants/backendURL";
-import type { ArticleDetails, ArticleList, ArticleOut } from "../models";
+import type {
+  ArticleCreateIn,
+  ArticleEditOut,
+  ArticleList,
+  ArticleOut,
+} from "../models";
 import { replaceBase64ImagesWithS3 } from "../utils/apiUtil";
 
 export const createArticle = async (
-  article: ArticleDetails,
+  article: ArticleCreateIn,
   token: string
 ): Promise<ArticleOut> => {
   const updatedContent = await replaceBase64ImagesWithS3(
     article.content,
     article.title
   );
-  const updatedArticle: ArticleDetails = {
+  const updatedArticle: ArticleCreateIn = {
     ...article,
     content: updatedContent,
   };
@@ -34,14 +39,14 @@ export const createArticle = async (
 
 export const updateArticle = async (
   id: string,
-  article: ArticleDetails,
+  article: ArticleCreateIn,
   token: string
 ): Promise<ArticleOut> => {
   const updatedContent = await replaceBase64ImagesWithS3(
     article.content,
     article.title
   );
-  const updatedArticle: ArticleDetails = {
+  const updatedArticle: ArticleCreateIn = {
     ...article,
     content: updatedContent,
   };
@@ -82,7 +87,7 @@ export const getArticles = async (token: string): Promise<ArticleList> => {
 export const getArticleEdit = async (
   token: string,
   id: string
-): Promise<ArticleDetails> => {
+): Promise<ArticleEditOut> => {
   const response = await fetch(
     `${BACKEND_URL}/api/articles/getEditDetails/${id}`,
     {
@@ -98,7 +103,7 @@ export const getArticleEdit = async (
     throw new Error(`Failed to fetch article: ${response.statusText}`);
   }
 
-  const data: ArticleDetails = await response.json();
+  const data: ArticleEditOut = await response.json();
   return data;
 };
 
@@ -116,6 +121,28 @@ export const deleteArticle = async (
 
   if (!response.ok) {
     throw new Error(`Failed to delete article: ${response.statusText}`);
+  }
+
+  const data: ArticleOut = await response.json();
+  return data;
+};
+
+export const archiveArticle = async (
+  token: string,
+  id: string,
+  archive: boolean
+): Promise<ArticleOut> => {
+  const response = await fetch(`${BACKEND_URL}/api/articles/archive/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ archive }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to archive article: ${response.statusText}`);
   }
 
   const data: ArticleOut = await response.json();

@@ -27,6 +27,12 @@ const ArticleList = () => {
     title: string;
   } | null>(null);
 
+  const [archiveTarget, setArchiveTarget] = useState<{
+    id: string;
+    title: string;
+    archived: boolean;
+  } | null>(null);
+
   const handleDelete = (id: string, title: string) => {
     setDeleteTarget({ id, title });
   };
@@ -47,6 +53,34 @@ const ArticleList = () => {
     }
   };
 
+  const handleArchive = (id: string, title: string, archived: boolean) => {
+    setArchiveTarget({ id, title, archived });
+  };
+
+  const confirmArchive = async () => {
+    if (!archiveTarget || !userToken) return;
+
+    setLoading(true);
+    try {
+      await api.archiveArticle(
+        userToken,
+        archiveTarget.id,
+        !archiveTarget.archived
+      );
+      showToast(
+        `Article Successfully ${
+          archiveTarget?.archived ? "Unarchived" : "Archived"
+        }`,
+        "success"
+      );
+    } catch {
+      showToast("Failed to archive/unarchive article", "error");
+    } finally {
+      setLoading(false);
+      setArchiveTarget(null);
+    }
+  };
+
   useEffect(() => {
     const getArticles = async () => {
       if (userToken) {
@@ -56,12 +90,28 @@ const ArticleList = () => {
           setRows(
             response.map((article) => {
               const date = new Date(article.publishDate);
+              let articleState = "";
+              if (article.archived) {
+                articleState = "Archived 📦";
+              } else {
+                if (article.readyToPublish) {
+                  if (date < new Date()) {
+                    articleState = "Published ✅";
+                  } else {
+                    articleState = "Scheduled 🕒";
+                  }
+                } else {
+                  articleState = "Draft ✏️";
+                }
+              }
               return {
                 id: article._id,
+                state: articleState,
                 title: article.title,
                 author: article.author,
                 publishDate: date.toLocaleString(),
                 ready: article.readyToPublish,
+                archived: article.archived,
               };
             })
           );
@@ -80,6 +130,7 @@ const ArticleList = () => {
   };
 
   const columns: GridColDef[] = [
+    { field: "state", headerName: "State", width: 150, editable: false },
     { field: "title", headerName: "Title", width: 150, editable: false },
     { field: "author", headerName: "Author", width: 150, editable: false },
     {
@@ -88,11 +139,7 @@ const ArticleList = () => {
       width: 150,
       editable: false,
       renderCell: (params) => (
-        <Checkbox
-          name="readyToPublish"
-          checked={params.row.ready} // use checked instead of value
-          disabled
-        />
+        <Checkbox name="readyToPublish" checked={params.row.ready} disabled />
       ),
     },
     {
@@ -104,17 +151,33 @@ const ArticleList = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 200,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
         <Box display="flex" flexDirection={"row"} sx={{ height: "100%" }}>
           <Button onClick={() => handleEdit(params.id.toString())}>Edit</Button>
-          <Button
-            onClick={() => handleDelete(params.id.toString(), params.row.title)}
-          >
-            Delete
-          </Button>
+          {!params.row.ready ? (
+            <Button
+              onClick={() =>
+                handleDelete(params.id.toString(), params.row.title)
+              }
+            >
+              Delete
+            </Button>
+          ) : (
+            <Button
+              onClick={() =>
+                handleArchive(
+                  params.id.toString(),
+                  params.row.title,
+                  params.row.archived
+                )
+              }
+            >
+              {params.row.archived ? "Unarchive" : "Archive"}
+            </Button>
+          )}
         </Box>
       ),
     },
@@ -147,6 +210,20 @@ const ArticleList = () => {
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
         confirmText="Delete"
+      />
+      <ConfirmDialog
+        open={!!archiveTarget}
+        title={`${archiveTarget?.archived ? "Unarchive" : "Archive"} Article`}
+        children={
+          <Typography>
+            Are you sure you want to{" "}
+            {archiveTarget?.archived ? "Unarchive" : "Archive"}{" "}
+            {archiveTarget?.title}
+          </Typography>
+        }
+        onClose={() => setArchiveTarget(null)}
+        onConfirm={confirmArchive}
+        confirmText={archiveTarget?.archived ? "Unarchive" : "Archive"}
       />
     </>
   );
