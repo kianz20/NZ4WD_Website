@@ -5,3 +5,4 @@ export type { ArticleCreateIn } from "./ArticleCreateIn";
 export type { ArticleEditOut } from "./ArticleEditOut";
 export type { ArticleList, ArticleListObject } from "./ArticleList";
 export type { ArticleOut } from "./ArticleOut";
+export type { ArticleDetails } from "./ArticleDetails";

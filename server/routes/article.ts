@@ -131,9 +131,16 @@ router.put("/:id", authenticateToken, async (req, res) => {
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const { articleType } = req.query;
+    const { articleType, activeOnly } = req.query;
     const filter: any = {};
+
     if (articleType) filter.articleType = articleType;
+
+    if (activeOnly === "true") {
+      filter.readyToPublish = true;
+      filter.publishDate = { $lte: new Date() };
+    }
+
     const articles = await Article.find(filter).select("-content");
     res.status(200).json(articles);
   } catch (error) {
