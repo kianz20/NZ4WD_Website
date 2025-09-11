@@ -5,6 +5,7 @@ import type {
   ArticleList,
   ArticleOut,
 } from "../models";
+import type { ArticleType } from "../pages/ArticleEditor";
 import {
   replaceContentImagesWithS3,
   replaceThumbnailImageWithS3,
@@ -93,8 +94,14 @@ export const updateArticle = async (
   return data;
 };
 
-export const getArticles = async (token: string): Promise<ArticleList> => {
-  const response = await fetch(`${BACKEND_URL}/api/articles/`, {
+export const getArticles = async (
+  token: string,
+  articleType?: ArticleType
+): Promise<ArticleList> => {
+  const url = new URL(`${BACKEND_URL}/api/articles/`);
+  if (articleType) url.searchParams.append("articleType", articleType);
+
+  const response = await fetch(url.toString(), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

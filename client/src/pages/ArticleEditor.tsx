@@ -24,7 +24,7 @@ import { downloadImageFromS3, getCroppedImg } from "../utils/pageUtils";
 import { s3prefix } from "../constants/s3Prefix";
 
 const articleTypeOptions = ["news", "article", "review"] as const;
-type ArticleType = (typeof articleTypeOptions)[number];
+export type ArticleType = (typeof articleTypeOptions)[number];
 
 interface FormValues {
   author: string;
@@ -33,6 +33,7 @@ interface FormValues {
   readyToPublish: boolean;
   tags: string[];
   articleType: ArticleType;
+  shortDescription?: string;
 }
 
 function getFileExtensionFromKey(key: string) {
@@ -139,7 +140,6 @@ const ArticleEditor = () => {
       api
         .getArticleEdit(userToken, id)
         .then((data) => {
-          console.log(data);
           setFormValues({
             author: data.author,
             publishDate: dayjs(data.publishDate),
@@ -147,6 +147,7 @@ const ArticleEditor = () => {
             title: data.title,
             tags: data.tags,
             articleType: data.articleType,
+            shortDescription: data.shortDescription,
           });
           setLoadedThumbnailURL(data.thumbnail);
           if (quillRef.current && data.content) {
@@ -168,8 +169,15 @@ const ArticleEditor = () => {
       setLoading(true);
 
       event.preventDefault();
-      const { author, publishDate, title, readyToPublish, tags, articleType } =
-        formValues;
+      const {
+        author,
+        publishDate,
+        title,
+        readyToPublish,
+        tags,
+        articleType,
+        shortDescription,
+      } = formValues;
 
       let croppedThumbnail;
 
@@ -186,16 +194,31 @@ const ArticleEditor = () => {
         ? loadedThumbnailURL
         : croppedThumbnail ?? undefined;
 
-      const transformedData = {
-        author: author,
-        title: title,
+      const transformedData: {
+        author: string;
+        title: string;
+        thumbnail: string | undefined;
+        articleType: "news" | "article" | "review";
+        readyToPublish: boolean;
+        publishDate: Date;
+        content: string;
+        tags: string[];
+        shortDescription?: string;
+      } = {
+        author,
+        title,
         thumbnail: thumbnailToUse,
-        articleType: articleType,
-        readyToPublish: readyToPublish,
+        articleType,
+        readyToPublish,
         publishDate: publishDate ? publishDate.toDate() : new Date(),
         content: getContent() || "",
-        tags: tags,
+        tags,
       };
+
+      if (shortDescription && shortDescription.trim() !== "") {
+        transformedData.shortDescription = shortDescription;
+      }
+
       try {
         if (id) {
           await api.updateArticle(id, transformedData, userToken);
@@ -247,6 +270,7 @@ const ArticleEditor = () => {
         <br />
         <br />
         <Autocomplete
+          sx={{ width: 500 }}
           multiple
           freeSolo
           options={[]}
@@ -256,6 +280,7 @@ const ArticleEditor = () => {
         />
         <br />
         <Autocomplete
+          sx={{ width: 500 }}
           options={articleTypeOptions}
           renderInput={(params) => (
             <TextField {...params} label="Article Type" />
@@ -272,7 +297,17 @@ const ArticleEditor = () => {
             }
           }}
         />
-
+        <br />
+        <TextField
+          sx={{ width: 500 }}
+          label="Short Description"
+          name="shortDescription"
+          value={formValues.shortDescription || ""}
+          multiline
+          rows={2}
+          onChange={(e) => handleChange("shortDescription", e.target.value)}
+        />
+        <br />
         <FormControlLabel
           control={
             <Checkbox
@@ -285,6 +320,7 @@ const ArticleEditor = () => {
         />
         {loadedThumbnailURL ? (
           <>
+            <Typography>Thumbnail</Typography>
             <Box component="img" src={loadedThumbnailURL} />
             <Button
               onClick={() => {

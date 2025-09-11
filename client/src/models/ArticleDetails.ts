@@ -3,6 +3,7 @@ export interface ArticleDetails {
   title: string;
   thumbnail?: string;
   articleType: "news" | "article" | "review";
+  shortDescription?: string;
   readyToPublish: boolean;
   publishDate: Date;
   content: string;

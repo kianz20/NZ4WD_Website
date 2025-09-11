@@ -29,6 +29,7 @@ router.post("/", authenticateToken, async (req, res) => {
       readyToPublish,
       publishDate,
       editedDate,
+      shortDescription,
       tags,
       thumbnail,
       articleType,
@@ -44,6 +45,7 @@ router.post("/", authenticateToken, async (req, res) => {
       content,
       publishDate,
       readyToPublish,
+      shortDescription,
       editedDate,
       tags,
       thumbnail,
@@ -68,6 +70,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       title,
       content,
       readyToPublish,
+      shortDescription,
       publishDate,
       tags,
       thumbnail,
@@ -103,6 +106,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
         title: title,
         content: content,
         readyToPublish: readyToPublish,
+        shortDescription,
         publishDate: publishDate,
         edited: true,
         tags: tags,
@@ -127,7 +131,10 @@ router.put("/:id", authenticateToken, async (req, res) => {
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const articles = await Article.find().select("-content");
+    const { articleType } = req.query;
+    const filter: any = {};
+    if (articleType) filter.articleType = articleType;
+    const articles = await Article.find(filter).select("-content");
     res.status(200).json(articles);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch articles: " + error });

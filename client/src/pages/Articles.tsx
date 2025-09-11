@@ -15,8 +15,7 @@ const Articles = () => {
       if (userToken) {
         setLoading(true);
         try {
-          const response = await api.getArticles(userToken);
-          console.log(response);
+          const response = await api.getArticles(userToken, "article");
         } catch {
           showToast("failed to get articles", "error");
         } finally {
