@@ -1,11 +1,6 @@
-export interface ArticleListObject {
-  author: string;
-  title: string;
-  readyToPublish: boolean;
-  publishDate: string;
-  edited?: boolean;
-  editedDate?: string;
-  archived?: boolean;
+import type { ArticleDetails } from "./ArticleDetails";
+
+export interface ArticleListObject extends ArticleDetails {
   _id: string;
 }
 

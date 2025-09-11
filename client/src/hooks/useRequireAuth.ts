@@ -1,21 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks";
 
 export function useRequireAuth(redirectTo = "/") {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (auth.isAuthenticated === undefined) return;
+    if (auth.loading) return; // wait for AuthProvider to finish
 
     if (!auth.isAuthenticated || !auth.userToken) {
       navigate(redirectTo, { replace: true });
     }
+  }, [
+    auth.loading,
+    auth.isAuthenticated,
+    auth.userToken,
+    navigate,
+    redirectTo,
+  ]);
 
-    setLoading(false);
-  }, [auth.isAuthenticated, auth.userToken, navigate, redirectTo]);
-
-  return { ...auth, loading };
+  // Return loading from auth instead of an undefined variable
+  return { ...auth, loading: auth.loading };
 }

@@ -10,6 +10,7 @@ export interface AuthData {
   userToken?: string;
   username?: string;
   authorName?: string;
+  loading?: boolean;
   logout: () => void;
   setUserCookies: (data: LoginResponse) => void;
 }
@@ -30,6 +31,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     authorName: undefined,
   });
 
+  const [loadingAuth, setLoadingAuth] = useState(true);
+
   const logout = useCallback(() => {
     ["token", "role", "id", "username", "authorName"].forEach((key) =>
       Cookies.remove(key)
@@ -48,15 +51,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const token = Cookies.get("token");
     if (token) {
       try {
-        // check expiry
         const { exp } = jwtDecode<{ exp: number }>(token);
         if (Date.now() >= exp * 1000) {
           logout();
-          return;
         }
       } catch {
         logout();
-        return;
       }
     }
 
@@ -68,7 +68,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       username: Cookies.get("username"),
       authorName: Cookies.get("authorName"),
     });
-  }, [logout]);
+
+    setLoadingAuth(false); // done checking cookies
+  }, []);
 
   const setUserCookies = (data: LoginResponse) => {
     const { user: { role, id, username, authorName } = {}, token } = data;
@@ -100,7 +102,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ ...authData, logout, setUserCookies }}>
+    <AuthContext.Provider
+      value={{ ...authData, logout, setUserCookies, loading: loadingAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );

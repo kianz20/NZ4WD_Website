@@ -23,13 +23,16 @@ import Cropper, { type Area } from "react-easy-crop";
 import { downloadImageFromS3, getCroppedImg } from "../utils/pageUtils";
 import { s3prefix } from "../constants/s3Prefix";
 
-type FormValues = {
+interface FormValues {
   author: string;
   publishDate: dayjs.Dayjs | null;
   title: string;
   readyToPublish: boolean;
   tags: string[];
-};
+  articleType: "news" | "article" | "review";
+}
+
+const articleTypeOptions = ["news", "article", "review"];
 
 function getFileExtensionFromKey(key: string) {
   const match = key.match(/\.(\w+)$/);
@@ -113,6 +116,7 @@ const ArticleEditor = () => {
     title: "",
     readyToPublish: false,
     tags: [],
+    articleType: "article",
   });
 
   const handleChange = <K extends keyof FormValues>(
@@ -140,6 +144,7 @@ const ArticleEditor = () => {
             readyToPublish: data.readyToPublish,
             title: data.title,
             tags: data.tags,
+            articleType: data.articleType,
           });
           setLoadedThumbnailURL(data.thumbnail);
           if (quillRef.current && data.content) {
@@ -161,7 +166,8 @@ const ArticleEditor = () => {
       setLoading(true);
 
       event.preventDefault();
-      const { author, publishDate, title, readyToPublish, tags } = formValues;
+      const { author, publishDate, title, readyToPublish, tags, articleType } =
+        formValues;
 
       let croppedThumbnail;
 
@@ -182,6 +188,7 @@ const ArticleEditor = () => {
         author: author,
         title: title,
         thumbnail: thumbnailToUse,
+        articleType: articleType,
         readyToPublish: readyToPublish,
         publishDate: publishDate ? publishDate.toDate() : new Date(),
         content: getContent() || "",
@@ -243,6 +250,13 @@ const ArticleEditor = () => {
           value={formValues.tags}
           onChange={(_, newValue) => handleChange("tags", newValue)}
           renderInput={(params) => <TextField {...params} label="Tags" />}
+        />
+        <br />
+        <Autocomplete
+          options={articleTypeOptions}
+          renderInput={(params) => (
+            <TextField {...params} label="Article Type" />
+          )}
         />
 
         <FormControlLabel

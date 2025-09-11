@@ -1,9 +1,4 @@
-export interface ArticleCreateIn {
-  author: string;
-  title: string;
-  thumbnail?: string;
-  readyToPublish: boolean;
-  publishDate: Date;
-  content: string;
-  tags: string[];
-}
+import type { ArticleDetails } from "./ArticleDetails";
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ArticleCreateIn extends ArticleDetails {}

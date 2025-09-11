@@ -6,6 +6,7 @@ interface Article extends Document {
   content: string;
   thumbnail: string;
   tags: string[];
+  articleType: "news" | "article" | "review";
   readyToPublish: boolean;
   publishDate: Date;
   edited: boolean;
@@ -19,6 +20,11 @@ const ArticleSchema: Schema<Article> = new Schema(
     content: { type: String, required: true },
     thumbnail: { type: String },
     tags: { type: [String], default: [] },
+    articleType: {
+      type: String,
+      enum: ["news", "article", "review"],
+      required: true,
+    },
     readyToPublish: { type: Boolean, required: true },
     publishDate: { type: Date, required: true },
     archived: { type: Boolean, default: false },
