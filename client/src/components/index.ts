@@ -4,3 +4,4 @@ export { default as LoginDialog } from "./LoginDialog";
 export { default as UserMenu } from "./UserMenu";
 export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as ConfirmDialog } from "./ConfirmDialog";
+export { default as HeadlineBanner } from "./HeadlineBanner";

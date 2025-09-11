@@ -1,0 +1,33 @@
+.banner {
+  background-color: rgb(219, 219, 219);
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.scroll {
+  display: inline-block;
+  animation: scroll-left 50s linear infinite;
+}
+
+.scroll div {
+  display: inline-block;
+  padding-right: 50px; /* gap between repeats */
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0); /* pause at start */
+  }
+  5% {
+    transform: translateX(
+      0
+    ); /* first 5% of animation = 3s pause (3s/60s = 5%) */
+  }
+  100% {
+    transform: translateX(-50%); /* scroll fully left */
+  }
+}

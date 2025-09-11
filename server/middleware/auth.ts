@@ -4,14 +4,16 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
 interface CustomJwtPayload extends JwtPayload {
-  userID?: string;
-  email?: string;
+  userID: string;
+  username: string;
+  authorName: string;
 }
 
 interface AuthenticatedRequest extends Request {
   userData?: {
-    userID?: string;
-    email?: string;
+    userID: string;
+    username: string;
+    authorName: string;
   };
 }
 
@@ -27,7 +29,8 @@ const authenticateToken = (
     const decoded = jwt.verify(token, JWT_SECRET) as CustomJwtPayload;
     req.userData = {
       userID: decoded.userID,
-      email: decoded.email,
+      username: decoded.username,
+      authorName: decoded.authorName,
     };
     next();
   } catch {

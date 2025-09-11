@@ -1,7 +1,8 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 // TypeScript interface for the User model
 interface IUser extends Document {
+  _id: Types.ObjectId;
   username: string;
   password: string;
   authorName: string;

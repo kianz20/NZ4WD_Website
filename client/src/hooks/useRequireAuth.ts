@@ -8,12 +8,14 @@ export function useRequireAuth(redirectTo = "/") {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (auth.userToken === undefined) return; // still loading
-    if (!auth.userToken) {
-      navigate(redirectTo);
-    }
-    setLoading(false); // token ready
-  }, [auth.userToken, navigate, redirectTo]);
+    if (auth.isAuthenticated === undefined) return;
 
-  return { ...auth, userToken: auth.userToken, loading };
+    if (!auth.isAuthenticated || !auth.userToken) {
+      navigate(redirectTo, { replace: true });
+    }
+
+    setLoading(false);
+  }, [auth.isAuthenticated, auth.userToken, navigate, redirectTo]);
+
+  return { ...auth, loading };
 }

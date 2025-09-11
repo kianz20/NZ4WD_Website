@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import type { LoginResponse } from "../models";
 
 export interface AuthData {
@@ -29,18 +30,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     authorName: undefined,
   });
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    setAuthData({
-      isAuthenticated: !!token,
-      userRole: Cookies.get("role"),
-      userID: Cookies.get("id"),
-      userToken: token,
-      username: Cookies.get("username"),
-      authorName: Cookies.get("authorName"),
-    });
-  }, []);
-
   const logout = useCallback(() => {
     ["token", "role", "id", "username", "authorName"].forEach((key) =>
       Cookies.remove(key)
@@ -55,36 +44,50 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      try {
+        // check expiry
+        const { exp } = jwtDecode<{ exp: number }>(token);
+        if (Date.now() >= exp * 1000) {
+          logout();
+          return;
+        }
+      } catch {
+        logout();
+        return;
+      }
+    }
+
+    setAuthData({
+      isAuthenticated: !!token,
+      userRole: Cookies.get("role"),
+      userID: Cookies.get("id"),
+      userToken: token,
+      username: Cookies.get("username"),
+      authorName: Cookies.get("authorName"),
+    });
+  }, [logout]);
+
   const setUserCookies = (data: LoginResponse) => {
     const { user: { role, id, username, authorName } = {}, token } = data;
-    if ([role, id, username, token].some((v) => v === undefined))
+    if ([role, id, username, authorName, token].some((v) => v === undefined)) {
       throw new Error("Missing required user info");
+    }
 
-    Cookies.set("token", token as string, {
-      expires: 1,
-      sameSite: "None",
+    // store cookies for 7 days (matches JWT expiry)
+    const cookieOptions = {
+      expires: 7,
+      sameSite: "None" as const,
       secure: true,
-    });
-    Cookies.set("role", role as string, {
-      expires: 1,
-      sameSite: "None",
-      secure: true,
-    });
-    Cookies.set("id", id as string, {
-      expires: 1,
-      sameSite: "None",
-      secure: true,
-    });
-    Cookies.set("username", username as string, {
-      expires: 1,
-      sameSite: "None",
-      secure: true,
-    });
-    Cookies.set("authorName", authorName as string, {
-      expires: 1,
-      sameSite: "None",
-      secure: true,
-    });
+    };
+
+    Cookies.set("token", token!, cookieOptions);
+    Cookies.set("role", role!, cookieOptions);
+    Cookies.set("id", id!, cookieOptions);
+    Cookies.set("username", username!, cookieOptions);
+    Cookies.set("authorName", authorName!, cookieOptions);
 
     setAuthData({
       isAuthenticated: true,

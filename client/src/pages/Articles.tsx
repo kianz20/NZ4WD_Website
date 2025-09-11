@@ -1,14 +1,12 @@
 import { Typography } from "@mui/material";
-import { Header, Navbar } from "../components";
+import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useRequireAuth, useToast } from "../hooks";
 import * as api from "../api/articleController";
 
 const Articles = () => {
   const { userToken } = useRequireAuth();
   const { showToast } = useToast();
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
@@ -31,8 +29,10 @@ const Articles = () => {
   }, [userToken]);
   return (
     <>
+      <LoadingSpinner open={loading} />
       <Header />
       <Navbar />
+      <HeadlineBanner />
       <Typography variant="h4" component="h1">
         Articles
       </Typography>
