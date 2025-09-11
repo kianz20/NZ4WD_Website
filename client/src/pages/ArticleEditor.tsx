@@ -23,16 +23,17 @@ import Cropper, { type Area } from "react-easy-crop";
 import { downloadImageFromS3, getCroppedImg } from "../utils/pageUtils";
 import { s3prefix } from "../constants/s3Prefix";
 
+const articleTypeOptions = ["news", "article", "review"] as const;
+type ArticleType = (typeof articleTypeOptions)[number];
+
 interface FormValues {
   author: string;
   publishDate: dayjs.Dayjs | null;
   title: string;
   readyToPublish: boolean;
   tags: string[];
-  articleType: "news" | "article" | "review";
+  articleType: ArticleType;
 }
-
-const articleTypeOptions = ["news", "article", "review"];
 
 function getFileExtensionFromKey(key: string) {
   const match = key.match(/\.(\w+)$/);
@@ -138,6 +139,7 @@ const ArticleEditor = () => {
       api
         .getArticleEdit(userToken, id)
         .then((data) => {
+          console.log(data);
           setFormValues({
             author: data.author,
             publishDate: dayjs(data.publishDate),
@@ -204,7 +206,8 @@ const ArticleEditor = () => {
         }
 
         navigate("/articleList");
-      } catch {
+      } catch (error) {
+        console.log(error);
         showToast("Save failed", "error");
       } finally {
         setLoading(false);
@@ -257,6 +260,17 @@ const ArticleEditor = () => {
           renderInput={(params) => (
             <TextField {...params} label="Article Type" />
           )}
+          value={formValues.articleType}
+          onChange={(_, newValue) => {
+            if (
+              newValue &&
+              articleTypeOptions.includes(newValue as ArticleType)
+            ) {
+              handleChange("articleType", newValue as ArticleType);
+            } else {
+              handleChange("articleType", "article"); // fallback
+            }
+          }}
         />
 
         <FormControlLabel

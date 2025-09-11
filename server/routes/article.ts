@@ -31,6 +31,7 @@ router.post("/", authenticateToken, async (req, res) => {
       editedDate,
       tags,
       thumbnail,
+      articleType,
     } = req.body;
 
     if (!author || !content) {
@@ -46,6 +47,7 @@ router.post("/", authenticateToken, async (req, res) => {
       editedDate,
       tags,
       thumbnail,
+      articleType,
     });
     await newArticle.save();
     res.json({ message: "Article Created" });
@@ -69,6 +71,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       publishDate,
       tags,
       thumbnail,
+      articleType,
     } = req.body;
 
     if (!author || !content) {
@@ -104,6 +107,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
         edited: true,
         tags: tags,
         thumbnail: thumbnail,
+        articleType: articleType,
       },
     };
 

@@ -2,10 +2,16 @@ import { BACKEND_URL } from "../constants/backendURL";
 
 function base64ToFile(base64: string, filename: string): File {
   const [meta, data] = base64.split(",");
-  const mime = meta.match(/:(.*?);/)![1];
+  if (!meta || !data) throw new Error("Invalid base64 string");
+
+  const match = meta.match(/:(.*?);/);
+  if (!match) throw new Error("Invalid base64 MIME type");
+
+  const mime = match[1];
   const binary = atob(data);
   const u8arr = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) u8arr[i] = binary.charCodeAt(i);
+
   return new File([u8arr], filename, { type: mime });
 }
 
@@ -58,6 +64,12 @@ async function replaceThumbnailImageWithS3(
   image: string,
   articleTitle: string
 ): Promise<string> {
+  const isBase64 = image.startsWith("data:") && image.includes("base64,");
+
+  if (!isBase64) {
+    return image;
+  }
+
   const safeArticleTitle = articleTitle
     .replace(/\s+/g, "-")
     .replace(/[^a-zA-Z0-9-_]/g, "");
@@ -66,6 +78,7 @@ async function replaceThumbnailImageWithS3(
     image,
     `${safeArticleTitle}-Thumbnail-${Date.now()}.png`
   );
+
   const s3Url = await uploadFileToS3(file);
   return s3Url;
 }
