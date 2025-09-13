@@ -50,6 +50,7 @@ const Articles = (props: ArticleProps) => {
       <Typography variant="h4" component="h1">
         Articles
       </Typography>
+
       <ArticleGrid articleList={articles} />
     </>
   );
