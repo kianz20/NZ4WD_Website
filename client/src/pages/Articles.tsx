@@ -6,9 +6,14 @@ import * as api from "../api/articleController";
 import { type ArticleList } from "../models";
 import { ArticleGrid } from "../components";
 
-const Articles = () => {
+interface ArticleProps {
+  articleFilter?: "news" | "article" | "review";
+}
+
+const Articles = (props: ArticleProps) => {
   const { userToken } = useRequireAuth();
   const { showToast } = useToast();
+  const { articleFilter } = props;
 
   const [articles, setArticles] = useState<ArticleList>();
 
@@ -19,7 +24,11 @@ const Articles = () => {
       if (userToken) {
         setLoading(true);
         try {
-          const response = await api.getArticles(userToken, true, "article");
+          const response = await api.getArticles(
+            userToken,
+            true,
+            articleFilter
+          );
           setArticles(response);
         } catch {
           showToast("failed to get articles", "error");

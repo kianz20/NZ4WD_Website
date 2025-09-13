@@ -23,6 +23,7 @@ const ArticleGridCell = (props: ArticleGridcellProps) => {
           src={article.thumbnail}
           className={styles.thumbnail}
         />
+        <Typography sx={{ fontSize: "13px" }}>{article.articleType}</Typography>
         <Typography component="h1" sx={{ fontWeight: "bold" }}>
           {article.title}
         </Typography>
