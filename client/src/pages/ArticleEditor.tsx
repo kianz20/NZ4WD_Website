@@ -49,8 +49,9 @@ const ArticleEditor = () => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   useEffect(() => {
-    if (editorRef.current && !quillRef.current) {
-      quillRef.current = new Quill(editorRef.current, {
+    const editorNode = editorRef.current;
+    if (editorNode && !quillRef.current) {
+      quillRef.current = new Quill(editorNode, {
         theme: "snow",
         modules: {
           toolbar: {
@@ -86,8 +87,8 @@ const ArticleEditor = () => {
     }
 
     return () => {
-      if (editorRef.current) {
-        editorRef.current.innerHTML = "";
+      if (editorNode) {
+        editorNode.innerHTML = "";
       }
       quillRef.current = null;
     };
