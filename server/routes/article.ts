@@ -252,4 +252,41 @@ router.put("/archive/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.put("/ready/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ready } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+
+    if (typeof ready !== "boolean") {
+      return res
+        .status(400)
+        .json({ error: "Ready value must be true or false" });
+    }
+
+    const updatedArticle = await Article.findByIdAndUpdate(
+      id,
+      { readyToPublish: ready },
+      { new: true }
+    );
+
+    if (!updatedArticle) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+
+    res.status(200).json({
+      message: `Article ${ready ? "made ready" : "made unready"} successfully`,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "An unexpected error occurred" });
+    }
+  }
+});
+
 export default router;

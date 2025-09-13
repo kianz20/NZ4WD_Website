@@ -179,3 +179,25 @@ export const archiveArticle = async (
   const data: ArticleOut = await response.json();
   return data;
 };
+
+export const readyArticle = async (
+  token: string,
+  id: string,
+  ready: boolean
+): Promise<ArticleOut> => {
+  const response = await fetch(`${BACKEND_URL}/api/articles/ready/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ ready }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to ready article: ${response.statusText}`);
+  }
+
+  const data: ArticleOut = await response.json();
+  return data;
+};

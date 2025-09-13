@@ -10,9 +10,35 @@ interface ArticleGridRows {
   id: string;
   title: string;
   author: string;
-  publishDate: string;
+  publishDate: Date;
   ready: boolean;
+  archived: boolean;
+  state: string;
 }
+
+const publishedState = "Published ✅";
+const archivedState = "Archived 📦";
+const scheduledState = "Scheduled 🕒";
+const draftState = "Draft ✏️";
+
+const getArticleState = (
+  article: {
+    readyToPublish: boolean;
+    archived: boolean;
+    publishDate: Date;
+  },
+  now: Date
+): string => {
+  if (article.archived) {
+    return archivedState;
+  } else if (article.readyToPublish) {
+    return new Date(article.publishDate) < now
+      ? publishedState
+      : scheduledState;
+  } else {
+    return draftState;
+  }
+};
 
 const ArticleList = () => {
   const { userToken } = useRequireAuth();
@@ -32,6 +58,9 @@ const ArticleList = () => {
     title: string;
     archived: boolean;
   } | null>(null);
+
+  // 1. ADD NEW STATE for the ready confirmation dialog
+  const [readyTargetId, setReadyTargetId] = useState<string | null>(null);
 
   const handleDelete = (id: string, title: string) => {
     setDeleteTarget({ id, title });
@@ -73,6 +102,24 @@ const ArticleList = () => {
         }`,
         "success"
       );
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === archiveTarget.id
+            ? {
+                ...row,
+                archived: !row.archived,
+                state: getArticleState(
+                  {
+                    ...row,
+                    archived: !row.archived,
+                    readyToPublish: row.ready,
+                  },
+                  new Date()
+                ),
+              }
+            : row
+        )
+      );
     } catch {
       showToast("Failed to archive/unarchive article", "error");
     } finally {
@@ -87,33 +134,24 @@ const ArticleList = () => {
         setLoading(true);
         try {
           const response = await api.getArticles(userToken);
+          const now = new Date();
           setRows(
-            response.map((article) => {
-              const date = new Date(article.publishDate);
-              let articleState = "";
-              if (article.archived) {
-                articleState = "Archived 📦";
-              } else {
-                if (article.readyToPublish) {
-                  if (date < new Date()) {
-                    articleState = "Published ✅";
-                  } else {
-                    articleState = "Scheduled 🕒";
-                  }
-                } else {
-                  articleState = "Draft ✏️";
-                }
-              }
-              return {
-                id: article._id,
-                state: articleState,
-                title: article.title,
-                author: article.author,
-                publishDate: date.toLocaleString(),
-                ready: article.readyToPublish,
-                archived: article.archived,
-              };
-            })
+            response.map((article) => ({
+              id: article._id,
+              state: getArticleState(
+                {
+                  readyToPublish: article.readyToPublish,
+                  archived: article.archived,
+                  publishDate: article.publishDate,
+                },
+                now
+              ),
+              title: article.title,
+              author: article.author,
+              publishDate: new Date(article.publishDate),
+              ready: article.readyToPublish,
+              archived: article.archived,
+            }))
           );
         } catch {
           showToast("failed to get articles", "error");
@@ -130,7 +168,68 @@ const ArticleList = () => {
     navigate(`/articleEditor/${id}`);
   };
 
-  const columns: GridColDef[] = [
+  // 2. CREATE a new function to process the "ready" toggle
+  const processReadyToggle = async (id: string) => {
+    const row = rows.find((r) => r.id === id);
+    if (!row || !userToken) return;
+
+    setLoading(true);
+    try {
+      await api.readyArticle(userToken, id, !row.ready);
+      setRows((prevRows) =>
+        prevRows.map((r) => {
+          if (r.id === id) {
+            const newReadyState = !r.ready;
+            const newState = getArticleState(
+              {
+                readyToPublish: newReadyState,
+                archived: r.archived,
+                publishDate: new Date(r.publishDate),
+              },
+              new Date()
+            );
+            return { ...r, ready: newReadyState, state: newState };
+          }
+          return r;
+        })
+      );
+      showToast(
+        `Article ${!row.ready ? "marked as ready" : "marked as not ready"}`,
+        "success"
+      );
+    } catch {
+      showToast("Failed to update ready status", "error");
+    } finally {
+      setLoading(false);
+      setReadyTargetId(null); // Close the dialog if it was open
+    }
+  };
+
+  // 3. MODIFY the original handler to check the date
+  const handleReadyToggle = (id: string) => {
+    const row = rows.find((r) => r.id === id);
+    if (!row) return;
+
+    // Check if we are setting it to "ready" AND the date is in the past
+    const isPublishingImmediately =
+      !row.ready && new Date(row.publishDate) < new Date();
+
+    if (isPublishingImmediately) {
+      // If so, open the confirmation dialog
+      setReadyTargetId(id);
+    } else {
+      // Otherwise, proceed immediately
+      processReadyToggle(id);
+    }
+  };
+
+  const confirmReadyAndPublish = () => {
+    if (readyTargetId) {
+      processReadyToggle(readyTargetId);
+    }
+  };
+
+  const columns: GridColDef<ArticleGridRows>[] = [
     { field: "state", headerName: "State", width: 150, editable: false },
     { field: "title", headerName: "Title", width: 150, editable: false },
     { field: "author", headerName: "Author", width: 150, editable: false },
@@ -140,7 +239,15 @@ const ArticleList = () => {
       width: 150,
       editable: false,
       renderCell: (params) => (
-        <Checkbox name="readyToPublish" checked={params.row.ready} disabled />
+        <Checkbox
+          name="readyToPublish"
+          checked={params.row.ready}
+          onChange={() => handleReadyToggle(params.id.toString())}
+          disabled={
+            params.row.state == publishedState ||
+            params.row.state == archivedState
+          }
+        />
       ),
     },
     {
@@ -148,6 +255,19 @@ const ArticleList = () => {
       headerName: "Publish Date",
       width: 200,
       editable: false,
+      renderCell: (params) => (
+        <Box
+          color={
+            params.row.publishDate < new Date() &&
+            params.row.state != publishedState &&
+            params.row.state != archivedState
+              ? "red"
+              : "black"
+          }
+        >
+          {params.row.publishDate.toLocaleString()}
+        </Box>
+      ),
     },
     {
       field: "actions",
@@ -193,7 +313,7 @@ const ArticleList = () => {
         Articles
       </Typography>
       <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid
+        <DataGrid<ArticleGridRows>
           rows={rows}
           columns={columns}
           checkboxSelection
@@ -225,6 +345,21 @@ const ArticleList = () => {
         onClose={() => setArchiveTarget(null)}
         onConfirm={confirmArchive}
         confirmText={archiveTarget?.archived ? "Unarchive" : "Archive"}
+      />
+
+      <ConfirmDialog
+        open={!!readyTargetId}
+        title="Publish Article Immediately?"
+        children={
+          <Typography>
+            This article's publish date is in the past. <br />
+            Marking it as ready will publish it immediately and this action
+            cannot be undone. <br /> Are you sure?
+          </Typography>
+        }
+        onClose={() => setReadyTargetId(null)}
+        onConfirm={confirmReadyAndPublish}
+        confirmText="Yes, Publish"
       />
     </>
   );

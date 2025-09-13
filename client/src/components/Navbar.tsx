@@ -43,10 +43,10 @@ const Navbar = () => {
           <Button component={Link} to="/brands" className={styles.link}>
             Brands
           </Button>
-          <Button component={Link} to="/aboutUs" className={styles.link}>
+          <Button component={Link} to="/about" className={styles.link}>
             About
           </Button>
-          <Button component={Link} to="/contactUs" className={styles.link}>
+          <Button component={Link} to="/contact" className={styles.link}>
             Contact
           </Button>
         </Box>

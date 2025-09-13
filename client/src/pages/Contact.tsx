@@ -1,11 +1,12 @@
 import { Typography } from "@mui/material";
-import { Header, Navbar } from "../components";
+import { Header, HeadlineBanner, Navbar } from "../components";
 
-const ContactUs = () => {
+const Contact = () => {
   return (
     <>
       <Header />
       <Navbar />
+      <HeadlineBanner />
       <Typography variant="h4" component="h1">
         Contact Us
       </Typography>
@@ -13,4 +14,4 @@ const ContactUs = () => {
   );
 };
 
-export default ContactUs;
+export default Contact;

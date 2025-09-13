@@ -1,12 +1,13 @@
 import { Box, Typography } from "@mui/material";
-import { Header, Navbar } from "../components";
+import { Header, HeadlineBanner, Navbar } from "../components";
 import pfp from "../assets/profilePicture.png";
 
-const AboutUs = () => {
+const About = () => {
   return (
     <>
       <Header />
       <Navbar />
+      <HeadlineBanner />
       <Box display="flex" justifyContent="center">
         <Box component="img" src={pfp} width="500px" />
       </Box>
@@ -68,4 +69,4 @@ const AboutUs = () => {
   );
 };
 
-export default AboutUs;
+export default About;

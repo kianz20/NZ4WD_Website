@@ -2,12 +2,12 @@ import { Routes, Route } from "react-router-dom";
 
 import {
   Home,
-  ContactUs,
+  Contact,
   Articles,
   Article,
   Reviews,
   Brands,
-  AboutUs,
+  About,
   LatestNews,
   ArticleEditor,
   ArticleList,
@@ -26,8 +26,8 @@ const App = () => {
         <Route path="/article/:id" element={<Article />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/brands" element={<Brands />} />
-        <Route path="/aboutUs" element={<AboutUs />} />
-        <Route path="/contactUs" element={<ContactUs />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </>
   );
