@@ -12,10 +12,16 @@ const zoomMin = 75;
 const zoomMax = 103;
 
 const ArticleGrid = (props: ArticleGridProps) => {
-  const [zoom, setZoom] = useState(75);
+  const [zoom, setZoom] = useState(() => {
+    const stored = localStorage.getItem("articleGridZoom");
+    return stored ? Number(stored) : zoomMin;
+  });
 
   const handleZoomChange = (event: Event, value: number | number[]) => {
-    if (typeof value === "number") setZoom(value);
+    if (typeof value === "number") {
+      setZoom(value);
+      localStorage.setItem("articleGridZoom", value.toString()); // persist
+    }
   };
 
   return (
