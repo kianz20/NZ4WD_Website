@@ -1,12 +1,21 @@
 import { Typography } from "@mui/material";
-import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
-import { useState, useEffect } from "react";
-import { useRequireAuth, useToast } from "../hooks";
+import { useEffect, useState } from "react";
 import * as api from "../api/articleController";
+import {
+  ArticleGrid,
+  Header,
+  HeadlineBanner,
+  LoadingSpinner,
+  Navbar,
+} from "../components";
+import { useRequireAuth, useToast } from "../hooks";
+import type { ArticleList } from "../models";
 
 const Reviews = () => {
   const { userToken } = useRequireAuth();
   const { showToast } = useToast();
+
+  const [reviews, setReviews] = useState<ArticleList>();
 
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +24,8 @@ const Reviews = () => {
       if (userToken) {
         setLoading(true);
         try {
-          const response = await api.getArticles(userToken, "article");
+          const response = await api.getArticles(userToken, true, "review");
+          setReviews(response);
         } catch {
           showToast("failed to get articles", "error");
         } finally {
@@ -35,6 +45,7 @@ const Reviews = () => {
       <Typography variant="h4" component="h1">
         Reviews
       </Typography>
+      <ArticleGrid articleList={reviews} />
     </>
   );
 };

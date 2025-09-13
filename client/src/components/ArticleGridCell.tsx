@@ -15,9 +15,7 @@ const ArticleGridCell = (props: ArticleGridcellProps) => {
       <Box
         className={styles.gridCell}
         onClick={() => {
-          console.log("Cell clicked!", article._id);
           navigate(`/article/${article._id}`);
-          // You can navigate or do anything here
         }}
       >
         <Box

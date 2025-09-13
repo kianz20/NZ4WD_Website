@@ -22,19 +22,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Cropper, { type Area } from "react-easy-crop";
 import { downloadImageFromS3, getCroppedImg } from "../utils/pageUtils";
 import { s3prefix } from "../constants/s3Prefix";
+import type { ArticleDetails } from "../models";
 
 const articleTypeOptions = ["news", "article", "review"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
-
-interface FormValues {
-  author: string;
-  publishDate: dayjs.Dayjs | null;
-  title: string;
-  readyToPublish: boolean;
-  tags: string[];
-  articleType: ArticleType;
-  shortDescription?: string;
-}
 
 function getFileExtensionFromKey(key: string) {
   const match = key.match(/\.(\w+)$/);
@@ -56,9 +47,6 @@ const ArticleEditor = () => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [loadedThumbnailURL, setLoadedThumbnailURL] = useState<
-    string | undefined
-  >();
 
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
@@ -112,18 +100,20 @@ const ArticleEditor = () => {
     }
   };
 
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [formValues, setFormValues] = useState<ArticleDetails>({
     author: "",
-    publishDate: dayjs(),
+    publishDate: dayjs().toDate(),
     title: "",
     readyToPublish: false,
     tags: [],
     articleType: "article",
+    content: "",
+    archived: false,
   });
 
-  const handleChange = <K extends keyof FormValues>(
+  const handleChange = <K extends keyof ArticleDetails>(
     field: K,
-    value: FormValues[K]
+    value: ArticleDetails[K]
   ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
@@ -138,18 +128,20 @@ const ArticleEditor = () => {
     if (id && userToken) {
       setLoading(true);
       api
-        .getArticleEdit(userToken, id)
+        .getArticle(userToken, id)
         .then((data) => {
           setFormValues({
             author: data.author,
-            publishDate: dayjs(data.publishDate),
+            publishDate: data.publishDate,
             readyToPublish: data.readyToPublish,
             title: data.title,
             tags: data.tags,
             articleType: data.articleType,
             shortDescription: data.shortDescription,
+            content: data.content,
+            archived: data.archived,
+            thumbnail: data.thumbnail,
           });
-          setLoadedThumbnailURL(data.thumbnail);
           if (quillRef.current && data.content) {
             quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
           }
@@ -181,7 +173,7 @@ const ArticleEditor = () => {
 
       let croppedThumbnail;
 
-      if (!loadedThumbnailURL) {
+      if (!formValues.thumbnail) {
         if (thumbnailFile && croppedAreaPixels) {
           croppedThumbnail = await getCroppedImg(
             thumbnailPreview!,
@@ -190,8 +182,8 @@ const ArticleEditor = () => {
         }
       }
 
-      const thumbnailToUse = loadedThumbnailURL
-        ? loadedThumbnailURL
+      const thumbnailToUse = formValues.thumbnail
+        ? formValues.thumbnail
         : croppedThumbnail ?? undefined;
 
       const transformedData: {
@@ -204,15 +196,17 @@ const ArticleEditor = () => {
         content: string;
         tags: string[];
         shortDescription?: string;
+        archived: boolean;
       } = {
         author,
         title,
         thumbnail: thumbnailToUse,
         articleType,
         readyToPublish,
-        publishDate: publishDate ? publishDate.toDate() : new Date(),
+        publishDate: publishDate ? publishDate : new Date(),
         content: getContent() || "",
         tags,
+        archived: formValues.archived,
       };
 
       if (shortDescription && shortDescription.trim() !== "") {
@@ -257,8 +251,13 @@ const ArticleEditor = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
             label="Publish Date"
-            value={formValues.publishDate}
-            onChange={(newValue) => handleChange("publishDate", newValue)}
+            value={dayjs(formValues.publishDate)}
+            onChange={(newValue) =>
+              handleChange(
+                "publishDate",
+                newValue ? newValue.toDate() : new Date()
+              )
+            }
           />
         </LocalizationProvider>
         <TextField
@@ -318,24 +317,31 @@ const ArticleEditor = () => {
           }
           label="Ready to Publish"
         />
-        {loadedThumbnailURL ? (
+        {formValues.thumbnail ? (
           <>
             <Typography>Thumbnail</Typography>
-            <Box component="img" src={loadedThumbnailURL} />
+            <Box component="img" src={formValues.thumbnail} />
             <Button
               onClick={() => {
-                setLoadedThumbnailURL(undefined);
+                setFormValues((prev) => ({
+                  ...prev,
+                  thumbnail: undefined,
+                }));
               }}
             >
               Remove
             </Button>
             <Button
               onClick={() => {
-                const extension = getFileExtensionFromKey(loadedThumbnailURL);
-                downloadImageFromS3(
-                  loadedThumbnailURL.replace(s3prefix, ""),
-                  `${formValues.title} article thumbnail.${extension}`
-                );
+                if (formValues.thumbnail) {
+                  const extension = getFileExtensionFromKey(
+                    formValues.thumbnail
+                  );
+                  downloadImageFromS3(
+                    formValues.thumbnail.replace(s3prefix, ""),
+                    `${formValues.title} article thumbnail.${extension}`
+                  );
+                }
               }}
             >
               Download

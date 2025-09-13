@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRequireAuth, useToast } from "../hooks";
 import * as api from "../api/articleController";
 import { type ArticleList } from "../models";
-import ArticleGrid from "../components/ArticleGrid";
+import { ArticleGrid } from "../components";
 
 const Articles = () => {
   const { userToken } = useRequireAuth();

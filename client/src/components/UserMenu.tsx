@@ -21,12 +21,13 @@ const UserMenu = ({ username }: { username: string }) => {
         {username}
       </Box>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={() => navigate("/articleEditor")}>
-          New Article
-        </MenuItem>
         <MenuItem onClick={() => navigate("/articleList")}>
           All Articles
         </MenuItem>
+        <MenuItem onClick={() => navigate("/articleEditor")}>
+          New Article
+        </MenuItem>
+
         {/* <MenuItem
           onClick={() => {
             navigate("/article");

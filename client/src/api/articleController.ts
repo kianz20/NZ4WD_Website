@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "../constants/backendURL";
 import type {
   ArticleCreateIn,
-  ArticleEditOut,
+  ArticleDetails,
   ArticleList,
   ArticleOut,
 } from "../models";
@@ -101,7 +101,6 @@ export const getArticles = async (
 ): Promise<ArticleList> => {
   const url = new URL(`${BACKEND_URL}/api/articles/`);
   if (articleType) url.searchParams.append("articleType", articleType);
-
   if (activeOnly) url.searchParams.append("activeOnly", activeOnly.toString());
 
   const response = await fetch(url.toString(), {
@@ -119,26 +118,23 @@ export const getArticles = async (
   return (await response.json()) as ArticleList;
 };
 
-export const getArticleEdit = async (
+export const getArticle = async (
   token: string,
   id: string
-): Promise<ArticleEditOut> => {
-  const response = await fetch(
-    `${BACKEND_URL}/api/articles/getEditDetails/${id}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+): Promise<ArticleDetails> => {
+  const response = await fetch(`${BACKEND_URL}/api/articles/article/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch article: ${response.statusText}`);
   }
 
-  const data: ArticleEditOut = await response.json();
+  const data: ArticleDetails = await response.json();
   return data;
 };
 

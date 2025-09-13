@@ -148,7 +148,7 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/getEditDetails/:id", authenticateToken, async (req, res) => {
+router.get("/article/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {

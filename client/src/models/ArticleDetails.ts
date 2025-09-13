@@ -8,4 +8,5 @@ export interface ArticleDetails {
   publishDate: Date;
   content: string;
   tags: string[];
+  archived: boolean;
 }

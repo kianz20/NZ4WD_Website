@@ -1,6 +1,6 @@
 import type { ArticleDetails } from "./ArticleDetails";
 
-export interface ArticleListObject extends ArticleDetails {
+export interface ArticleListObject extends Omit<ArticleDetails, "content"> {
   _id: string;
 }
 
