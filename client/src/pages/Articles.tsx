@@ -40,6 +40,7 @@ const Articles = (props: ArticleProps) => {
     getArticles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userToken]);
+
   return (
     <>
       <LoadingSpinner open={loading} />

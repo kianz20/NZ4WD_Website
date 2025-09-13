@@ -312,7 +312,7 @@ const ArticleList = () => {
       <Typography variant="h4" component="h1">
         Articles
       </Typography>
-      <Box sx={{ height: 400, width: "100%" }}>
+      <Box sx={{ height: 800, width: "100%" }}>
         <DataGrid<ArticleGridRows>
           rows={rows}
           columns={columns}

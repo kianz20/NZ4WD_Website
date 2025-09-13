@@ -1,4 +1,20 @@
+.gridWrapper {
+  display: flex;
+  align-items: flex-start; /* align slider and grid top-aligned */
+  gap: 16px; /* space between grid and slider */
+}
+
 .grid {
+  flex: 1; /* take remaining width */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
   margin-top: 30px;
-  margin-left: 30px;
+  margin-left: 80px;
+}
+
+.sliderContainer {
+  height: 200px; /* fixed height for slider */
+  display: flex;
+  align-items: center;
 }
