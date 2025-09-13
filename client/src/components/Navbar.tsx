@@ -5,6 +5,7 @@ import styles from "../styles/Navbar.module.css";
 import { LoginDialog } from "../components";
 import { useAuth } from "../hooks";
 import { UserMenu } from ".";
+import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -49,6 +50,7 @@ const Navbar = () => {
           <Button component={Link} to="/contact" className={styles.link}>
             Contact
           </Button>
+          <SearchBar />
         </Box>
 
         {/* Right button */}

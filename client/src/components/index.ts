@@ -6,3 +6,4 @@ export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as ConfirmDialog } from "./ConfirmDialog";
 export { default as HeadlineBanner } from "./HeadlineBanner";
 export { default as ArticleGrid } from "./ArticleGrid";
+export { default as SearchBar } from "./SearchBar";

@@ -12,7 +12,7 @@ const zoomMin = 75;
 const zoomMax = 103;
 
 const ArticleGrid = (props: ArticleGridProps) => {
-  const [zoom, setZoom] = useState(30);
+  const [zoom, setZoom] = useState(75);
 
   const handleZoomChange = (event: Event, value: number | number[]) => {
     if (typeof value === "number") setZoom(value);
