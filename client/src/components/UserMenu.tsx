@@ -27,6 +27,7 @@ const UserMenu = ({ username }: { username: string }) => {
         <MenuItem onClick={() => navigate("/articleEditor")}>
           New Article
         </MenuItem>
+        <MenuItem onClick={() => navigate("/brandEditor")}>New Brand</MenuItem>
 
         {/* <MenuItem
           onClick={() => {
