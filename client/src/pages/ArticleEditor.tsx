@@ -107,6 +107,7 @@ const ArticleEditor = () => {
     title: "",
     readyToPublish: false,
     tags: [],
+    hiddenTags: [],
     articleType: "article",
     content: "",
     archived: false,
@@ -129,7 +130,7 @@ const ArticleEditor = () => {
     if (id && userToken) {
       setLoading(true);
       api
-        .getArticle(userToken, id)
+        .getArticle(id)
         .then((data) => {
           setFormValues({
             author: data.author,
@@ -137,6 +138,7 @@ const ArticleEditor = () => {
             readyToPublish: data.readyToPublish,
             title: data.title,
             tags: data.tags,
+            hiddenTags: data.tags,
             articleType: data.articleType,
             shortDescription: data.shortDescription,
             content: data.content,
@@ -168,8 +170,10 @@ const ArticleEditor = () => {
         title,
         readyToPublish,
         tags,
+        hiddenTags,
         articleType,
         shortDescription,
+        archived,
       } = formValues;
 
       let croppedThumbnail;
@@ -196,6 +200,7 @@ const ArticleEditor = () => {
         publishDate: Date;
         content: string;
         tags: string[];
+        hiddenTags: string[];
         shortDescription?: string;
         archived: boolean;
       } = {
@@ -207,7 +212,8 @@ const ArticleEditor = () => {
         publishDate: publishDate ? publishDate : new Date(),
         content: getContent() || "",
         tags,
-        archived: formValues.archived,
+        hiddenTags,
+        archived,
       };
 
       if (shortDescription && shortDescription.trim() !== "") {
@@ -277,6 +283,18 @@ const ArticleEditor = () => {
           value={formValues.tags}
           onChange={(_, newValue) => handleChange("tags", newValue)}
           renderInput={(params) => <TextField {...params} label="Tags" />}
+        />
+        <br />
+        <Autocomplete
+          sx={{ width: 500 }}
+          multiple
+          freeSolo
+          options={[]}
+          value={formValues.hiddenTags}
+          onChange={(_, newValue) => handleChange("hiddenTags", newValue)}
+          renderInput={(params) => (
+            <TextField {...params} label="Hidden Tags" />
+          )}
         />
         <br />
         <Autocomplete

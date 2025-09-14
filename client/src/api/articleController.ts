@@ -95,7 +95,6 @@ export const updateArticle = async (
 };
 
 export const getArticles = async (
-  token: string,
   activeOnly?: boolean,
   articleType?: ArticleType
 ): Promise<ArticleList> => {
@@ -107,7 +106,6 @@ export const getArticles = async (
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -118,15 +116,11 @@ export const getArticles = async (
   return (await response.json()) as ArticleList;
 };
 
-export const getArticle = async (
-  token: string,
-  id: string
-): Promise<ArticleDetails> => {
+export const getArticle = async (id: string): Promise<ArticleDetails> => {
   const response = await fetch(`${BACKEND_URL}/api/articles/article/${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
   });
 

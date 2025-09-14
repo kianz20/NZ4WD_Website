@@ -83,7 +83,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { articleType, activeOnly } = req.query;
     const filter: any = {};
@@ -102,7 +102,7 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/article/:id", authenticateToken, async (req, res) => {
+router.get("/article/:id", async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {

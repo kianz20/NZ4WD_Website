@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
 import { useEffect, useState } from "react";
-import { useAuth, useToast } from "../hooks";
+import { useToast } from "../hooks";
 import * as api from "../api/articleController";
 import { type ArticleList } from "../models";
 import { ArticleGrid } from "../components";
@@ -11,7 +11,6 @@ interface ArticleProps {
 }
 
 const Articles = (props: ArticleProps) => {
-  const { userToken } = useAuth();
   const { showToast } = useToast();
   const { articleFilter } = props;
 
@@ -21,25 +20,19 @@ const Articles = (props: ArticleProps) => {
 
   useEffect(() => {
     const getArticles = async () => {
-      if (userToken) {
-        setLoading(true);
-        try {
-          const response = await api.getArticles(
-            userToken,
-            true,
-            articleFilter
-          );
-          setArticles(response);
-        } catch {
-          showToast("failed to get articles", "error");
-        } finally {
-          setLoading(false);
-        }
+      setLoading(true);
+      try {
+        const response = await api.getArticles(true, articleFilter);
+        setArticles(response);
+      } catch {
+        showToast("failed to get articles", "error");
+      } finally {
+        setLoading(false);
       }
     };
     getArticles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userToken]);
+  }, []);
 
   return (
     <>
