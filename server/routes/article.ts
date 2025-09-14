@@ -22,42 +22,17 @@ const s3 = new S3Client({
 
 router.post("/", authenticateToken, async (req, res) => {
   try {
-    const {
-      author,
-      title,
-      content,
-      readyToPublish,
-      publishDate,
-      editedDate,
-      shortDescription,
-      tags,
-      thumbnail,
-      articleType,
-    } = req.body;
-
-    if (!author || !content) {
+    if (!req.body.author || !req.body.content) {
       return res.status(400).json({ error: "Author and Content are required" });
     }
 
-    const newArticle = new Article({
-      author,
-      title,
-      content,
-      publishDate,
-      readyToPublish,
-      shortDescription,
-      editedDate,
-      tags,
-      thumbnail,
-      articleType,
-    });
+    const newArticle = new Article({ ...req.body });
     await newArticle.save();
+
     res.json({ message: "Article Created" });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({
-        error: error.message,
-      });
+      res.status(500).json({ error: error.message });
     }
   }
 });
@@ -65,29 +40,20 @@ router.post("/", authenticateToken, async (req, res) => {
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      author,
-      title,
-      content,
-      readyToPublish,
-      shortDescription,
-      publishDate,
-      tags,
-      thumbnail,
-      articleType,
-    } = req.body;
 
-    if (!author || !content) {
+    if (!req.body.author || !req.body.content) {
       return res.status(400).json({ error: "Author and Content are required" });
     }
 
     const articleToEdit = await Article.findById(id);
-
     if (!articleToEdit) {
       return res.status(404).json({ error: "Article not found" });
     }
 
-    if (articleToEdit.thumbnail && articleToEdit.thumbnail !== thumbnail) {
+    if (
+      articleToEdit.thumbnail &&
+      articleToEdit.thumbnail !== req.body.thumbnail
+    ) {
       try {
         await s3.send(
           new DeleteObjectCommand({
@@ -102,29 +68,17 @@ router.put("/:id", authenticateToken, async (req, res) => {
 
     const update = {
       $set: {
-        author: author,
-        title: title,
-        content: content,
-        readyToPublish: readyToPublish,
-        shortDescription,
-        publishDate: publishDate,
+        ...req.body,
         edited: true,
-        tags: tags,
-        thumbnail: thumbnail,
-        articleType: articleType,
       },
     };
 
-    await Article.findByIdAndUpdate(id, update, {
-      new: true,
-    });
+    await Article.findByIdAndUpdate(id, update, { new: true });
 
     res.json({ message: "Article Updated" });
   } catch (error) {
     if (error instanceof Error) {
-      res.status(500).json({
-        error: error.message,
-      });
+      res.status(500).json({ error: error.message });
     }
   }
 });

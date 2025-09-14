@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
 import { useEffect, useState } from "react";
-import { useRequireAuth, useToast } from "../hooks";
+import { useAuth, useToast } from "../hooks";
 import * as api from "../api/articleController";
 import { type ArticleList } from "../models";
 import { ArticleGrid } from "../components";
@@ -11,7 +11,7 @@ interface ArticleProps {
 }
 
 const Articles = (props: ArticleProps) => {
-  const { userToken } = useRequireAuth();
+  const { userToken } = useAuth();
   const { showToast } = useToast();
   const { articleFilter } = props;
 
