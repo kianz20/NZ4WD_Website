@@ -28,15 +28,7 @@ const UserMenu = ({ username }: { username: string }) => {
           New Article
         </MenuItem>
         <MenuItem onClick={() => navigate("/brandEditor")}>New Brand</MenuItem>
-
-        {/* <MenuItem
-          onClick={() => {
-            navigate("/article");
-            handleClose(); // close the menu after navigation
-          }}
-        >
-          Settings
-        </MenuItem> */}
+        <MenuItem onClick={() => navigate("/brandList")}>All Brands</MenuItem>
       </Menu>
     </Box>
   );

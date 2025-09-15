@@ -133,7 +133,7 @@ const ArticleList = () => {
       if (userToken) {
         setLoading(true);
         try {
-          const response = await api.getArticles(userToken);
+          const response = await api.getArticles(false);
           const now = new Date();
           setRows(
             response.map((article) => ({

@@ -9,3 +9,4 @@ export { default as LatestNews } from "./LatestNews";
 export { default as Reviews } from "./Reviews";
 export { default as ArticleList } from "./ArticleList";
 export { default as BrandEditor } from "./BrandEditor";
+export { default as BrandList } from "./BrandList";

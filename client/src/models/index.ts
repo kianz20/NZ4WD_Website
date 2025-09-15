@@ -6,3 +6,4 @@ export type { ArticleList, ArticleListObject } from "./ArticleList";
 export type { GenericOut } from "./GenericOut";
 export type { ArticleDetails } from "./ArticleDetails";
 export type { BrandDetails } from "./BrandDetails";
+export type { BrandList } from "./BrandList";

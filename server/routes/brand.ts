@@ -1,14 +1,15 @@
 import express from "express";
 import authenticateToken from "../middleware/auth.ts";
-import { S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { fromEnv } from "@aws-sdk/credential-providers";
 import Brand from "../models/Brand.ts";
+import { JSDOM } from "jsdom";
 
 const router = express.Router();
 const bucket = process.env.REACT_APP_S3_BUCKET || "nz4wd-images";
-// const prefix =
-//   process.env.REACT_APP_S3_PREFIX ||
-//   `https://${bucket}.s3.ap-southeast-2.amazonaws.com/`;
+const prefix =
+  process.env.REACT_APP_S3_PREFIX ||
+  `https://${bucket}.s3.ap-southeast-2.amazonaws.com/`;
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -78,24 +79,17 @@ router.post("/", authenticateToken, async (req, res) => {
 //   }
 // });
 
-// router.get("/", async (req, res) => {
-//   try {
-//     const { articleType, activeOnly } = req.query;
-//     const filter: any = {};
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const { includeHidden } = req.query;
+    const filter: any = {};
 
-//     if (articleType) filter.articleType = articleType;
-
-//     if (activeOnly === "true") {
-//       filter.readyToPublish = true;
-//       filter.publishDate = { $lte: new Date() };
-//     }
-
-//     const articles = await Article.find(filter).select("-content");
-//     res.status(200).json(articles);
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to fetch articles: " + error });
-//   }
-// });
+    const brands = await Brand.find(filter);
+    res.status(200).json(brands);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch brands: " + error });
+  }
+});
 
 // router.get("/article/:id", async (req, res) => {
 //   try {
@@ -113,56 +107,38 @@ router.post("/", authenticateToken, async (req, res) => {
 //   }
 // });
 
-// router.delete("/delete/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id) {
-//       return res.status(400).json({ error: "ID is required" });
-//     }
-//     const articleToDelete = await Article.findById(id);
+router.delete("/delete/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+    const brandToDelete = await Brand.findById(id);
 
-//     if (!articleToDelete) {
-//       return res.status(404).json({ error: "Article not found" });
-//     }
+    if (!brandToDelete) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
 
-//     const dom = new JSDOM(articleToDelete.content);
-//     const { document, HTMLImageElement } = dom.window;
-//     const imageURLs = Array.from(document.querySelectorAll("img"))
-//       .filter(
-//         (el): el is InstanceType<typeof HTMLImageElement> =>
-//           el instanceof HTMLImageElement
-//       )
-//       .map((img) => img.src);
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: brandToDelete.name.replace(prefix, ""),
+      })
+    );
 
-//     const keys = imageURLs
-//       .filter((url) => url.startsWith(prefix))
-//       .map((url) => url.replace(prefix, ""));
+    await Brand.findByIdAndDelete(id);
 
-//     if (keys.length > 0) {
-//       await s3.send(
-//         new DeleteObjectsCommand({
-//           Bucket: bucket,
-//           Delete: {
-//             Objects: keys.map((Key) => ({ Key })),
-//             Quiet: true,
-//           },
-//         })
-//       );
-//     }
-
-//     await Article.findByIdAndDelete(id);
-
-//     res.status(200).json({
-//       message: "Article deleted successfully",
-//     });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(500).json({ error: error.message });
-//     } else {
-//       res.status(500).json({ error: "An unexpected error occurred" });
-//     }
-//   }
-// });
+    res.status(200).json({
+      message: "Brand deleted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "An unexpected error occurred" });
+    }
+  }
+});
 
 // router.put("/archive/:id", authenticateToken, async (req, res) => {
 //   try {
