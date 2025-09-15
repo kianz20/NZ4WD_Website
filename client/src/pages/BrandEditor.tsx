@@ -56,13 +56,8 @@ const BrandEditor = () => {
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!formValues.name) {
-      showToast("You must specify brand name", "error");
-      return;
-    }
-
     if (!formValues.logo) {
-      showToast("you must specify brand logo", "error");
+      showToast("You must provide a logo", "error");
       return;
     }
 
@@ -98,10 +93,11 @@ const BrandEditor = () => {
       </Typography>
       <form onSubmit={handleSave}>
         <TextField
-          label="Title"
-          name="title"
+          label="Brand Name"
+          name="name"
           value={formValues.name}
           onChange={(e) => handleChange("name", e.target.value)}
+          required
         />
         <ImageUpload
           setOutput={(value) => {

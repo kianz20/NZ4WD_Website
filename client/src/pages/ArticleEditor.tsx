@@ -85,6 +85,13 @@ const ArticleEditor = () => {
     }
   };
 
+  const getTextContent = () => {
+    if (quillRef.current) {
+      const textContent = quillRef.current.root.textContent;
+      return textContent;
+    }
+  };
+
   const [formValues, setFormValues] = useState<ArticleDetails>({
     author: "",
     publishDate: dayjs().toDate(),
@@ -160,6 +167,15 @@ const ArticleEditor = () => {
         archived,
       } = formValues;
 
+      const textContent = getTextContent();
+      const htmlContent = getContent();
+
+      if (!textContent?.trim() || !htmlContent) {
+        showToast("Article content cannot be empty", "error");
+        setLoading(false);
+        return;
+      }
+
       const transformedData: {
         author: string;
         title: string;
@@ -179,7 +195,7 @@ const ArticleEditor = () => {
         articleType,
         readyToPublish,
         publishDate: publishDate ? publishDate : new Date(),
-        content: getContent() || "",
+        content: htmlContent,
         tags,
         hiddenTags,
         archived,
@@ -222,6 +238,7 @@ const ArticleEditor = () => {
           name="author"
           value={formValues.author}
           onChange={(e) => handleChange("author", e.target.value)}
+          required
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
@@ -240,6 +257,7 @@ const ArticleEditor = () => {
           name="title"
           value={formValues.title}
           onChange={(e) => handleChange("title", e.target.value)}
+          required
         />
         <br />
         <br />
@@ -292,6 +310,7 @@ const ArticleEditor = () => {
           multiline
           rows={2}
           onChange={(e) => handleChange("shortDescription", e.target.value)}
+          required
         />
         <br />
         <FormControlLabel
