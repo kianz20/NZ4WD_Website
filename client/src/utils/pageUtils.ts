@@ -34,6 +34,11 @@ function getCroppedImg(
   });
 }
 
+function getFileExtensionFromKey(key: string) {
+  const match = key.match(/\.(\w+)$/);
+  return match ? match[1] : "png"; // default to png if no extension
+}
+
 async function downloadImage(url: string, filename: string) {
   const res = await fetch(url);
   const blob = await res.blob();
@@ -65,4 +70,9 @@ async function downloadImageFromS3(key: string, filename: string) {
   URL.revokeObjectURL(link.href);
 }
 
-export { getCroppedImg, downloadImage, downloadImageFromS3 };
+export {
+  getCroppedImg,
+  downloadImage,
+  downloadImageFromS3,
+  getFileExtensionFromKey,
+};

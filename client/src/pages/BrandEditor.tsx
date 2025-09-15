@@ -1,25 +1,24 @@
-import { Box, Button, Slider, TextField, Typography } from "@mui/material";
-import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
-import { useState } from "react";
+import { Button, TextField, Typography } from "@mui/material";
+import {
+  Header,
+  HeadlineBanner,
+  ImageUpload,
+  LoadingSpinner,
+  Navbar,
+} from "../components";
+import { useEffect, useState } from "react";
 import type { BrandDetails } from "../models";
 import { useRequireAuth, useToast } from "../hooks";
 import * as api from "../api/brandController";
-import Cropper, { type Area } from "react-easy-crop";
-import { getCroppedImg } from "../utils/pageUtils";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const BrandEditor = () => {
   const { userToken } = useRequireAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
 
   const [loading, setLoading] = useState(false);
-
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const [formValues, setFormValues] = useState<BrandDetails>({
     name: "",
@@ -33,16 +32,31 @@ const BrandEditor = () => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
+  useEffect(() => {
+    if (id && userToken) {
+      setLoading(true);
+      api
+        .getBrand(id)
+        .then((data) => {
+          setFormValues({
+            name: data.name,
+            logo: data.logo,
+          });
+        })
+        .catch(() => {
+          showToast("Failed to load article", "error");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, userToken]);
+
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
 
     let croppedLogo;
-
-    if (!formValues.logo) {
-      if (logoFile && croppedAreaPixels) {
-        croppedLogo = await getCroppedImg(logoPreview!, croppedAreaPixels);
-      }
-    }
 
     const logoToUse = formValues.logo
       ? formValues.logo
@@ -65,7 +79,11 @@ const BrandEditor = () => {
 
     if (userToken) {
       try {
-        await api.createBrand(transformedData, userToken);
+        if (id) {
+          await api.updateBrand(id, transformedData, userToken);
+        } else {
+          await api.createBrand(transformedData, userToken);
+        }
         navigate("/brandList");
       } catch (error) {
         console.log(error);
@@ -92,63 +110,15 @@ const BrandEditor = () => {
           value={formValues.name}
           onChange={(e) => handleChange("name", e.target.value)}
         />
-        <Box mb={2}>
-          <Button variant="contained" component="label">
-            Upload Logo
-            <input
-              hidden
-              accept="image/*"
-              type="file"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  const file = e.target.files[0];
-                  setLogoFile(file);
-                  setLogoPreview(URL.createObjectURL(file));
-                }
-              }}
-            />
-          </Button>
-        </Box>
-        {logoPreview && (
-          <Box
-            mb={2}
-            sx={{
-              position: "relative",
-              width: 500,
-              height: 300,
-              bgcolor: "#333",
-              borderRadius: 1,
-              overflow: "hidden",
-            }}
-          >
-            <Cropper
-              image={logoPreview}
-              crop={crop}
-              zoom={zoom}
-              aspect={5 / 3}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={(_, croppedPixels) =>
-                setCroppedAreaPixels(croppedPixels)
-              }
-              restrictPosition={false}
-            />
-          </Box>
-        )}
-        {/* Zoom Slider */}
-        {logoPreview && (
-          <Box mb={2}>
-            <Slider
-              value={zoom}
-              min={0.3}
-              max={3}
-              step={0.1}
-              onChange={(_, value) => setZoom(value as number)}
-              valueLabelDisplay="auto"
-              marks
-            />
-          </Box>
-        )}
+        <ImageUpload
+          setOutput={(value) => {
+            if (value) handleChange("logo", value);
+          }}
+          downloadFileName={`${formValues.name}-logo`}
+          headingText="Brand Logo"
+          existingFile={formValues.logo}
+        />
+
         <Button variant="outlined" type="submit">
           Save
         </Button>

@@ -33,51 +33,47 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
-// router.put("/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const { id } = req.params;
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//     if (!req.body.author || !req.body.content) {
-//       return res.status(400).json({ error: "Author and Content are required" });
-//     }
+    if (!req.body.name || !req.body.logo) {
+      return res.status(400).json({ error: "Name and Logo are required" });
+    }
 
-//     const articleToEdit = await Article.findById(id);
-//     if (!articleToEdit) {
-//       return res.status(404).json({ error: "Article not found" });
-//     }
+    const brandToEdit = await Brand.findById(id);
+    if (!brandToEdit) {
+      return res.status(404).json({ error: "Brand not found" });
+    }
 
-//     if (
-//       articleToEdit.thumbnail &&
-//       articleToEdit.thumbnail !== req.body.thumbnail
-//     ) {
-//       try {
-//         await s3.send(
-//           new DeleteObjectCommand({
-//             Bucket: bucket,
-//             Key: articleToEdit.thumbnail.replace(prefix, ""),
-//           })
-//         );
-//       } catch (s3Error) {
-//         console.error("Failed to delete old thumbnail:", s3Error);
-//       }
-//     }
+    if (brandToEdit.logo && brandToEdit.logo !== req.body.logo) {
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: bucket,
+            Key: brandToEdit.logo.replace(prefix, ""),
+          })
+        );
+      } catch (s3Error) {
+        console.error("Failed to delete old thumbnail:", s3Error);
+      }
+    }
 
-//     const update = {
-//       $set: {
-//         ...req.body,
-//         edited: true,
-//       },
-//     };
+    const update = {
+      $set: {
+        ...req.body,
+      },
+    };
 
-//     await Article.findByIdAndUpdate(id, update, { new: true });
+    await Brand.findByIdAndUpdate(id, update, { new: true });
 
-//     res.json({ message: "Article Updated" });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(500).json({ error: error.message });
-//     }
-//   }
-// });
+    res.json({ message: "Brand Updated" });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -91,21 +87,21 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-// router.get("/article/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id) {
-//       return res.status(400).json({ error: "ID is required" });
-//     }
-//     const articleEditDetails = await Article.findById(id);
-//     if (!articleEditDetails) {
-//       return res.status(404).json({ error: "No article was found" });
-//     }
-//     res.status(200).json(articleEditDetails);
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to fetch article: " + error });
-//   }
-// });
+router.get("/brand/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+    const brandDetails = await Brand.findById(id);
+    if (!brandDetails) {
+      return res.status(404).json({ error: "No brand was found" });
+    }
+    res.status(200).json(brandDetails);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch Brand: " + error });
+  }
+});
 
 router.delete("/delete/:id", authenticateToken, async (req, res) => {
   try {
@@ -122,7 +118,7 @@ router.delete("/delete/:id", authenticateToken, async (req, res) => {
     await s3.send(
       new DeleteObjectCommand({
         Bucket: bucket,
-        Key: brandToDelete.name.replace(prefix, ""),
+        Key: brandToDelete.logo.replace(prefix, ""),
       })
     );
 
@@ -139,79 +135,5 @@ router.delete("/delete/:id", authenticateToken, async (req, res) => {
     }
   }
 });
-
-// router.put("/archive/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { archive } = req.body;
-
-//     if (!id) {
-//       return res.status(400).json({ error: "ID is required" });
-//     }
-
-//     if (typeof archive !== "boolean") {
-//       return res
-//         .status(400)
-//         .json({ error: "Archive value must be true or false" });
-//     }
-
-//     const updatedArticle = await Article.findByIdAndUpdate(
-//       id,
-//       { archived: archive },
-//       { new: true } // return the updated document
-//     );
-
-//     if (!updatedArticle) {
-//       return res.status(404).json({ error: "Article not found" });
-//     }
-
-//     res.status(200).json({
-//       message: `Article ${archive ? "archived" : "unarchived"} successfully`,
-//     });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(500).json({ error: error.message });
-//     } else {
-//       res.status(500).json({ error: "An unexpected error occurred" });
-//     }
-//   }
-// });
-
-// router.put("/ready/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { ready } = req.body;
-
-//     if (!id) {
-//       return res.status(400).json({ error: "ID is required" });
-//     }
-
-//     if (typeof ready !== "boolean") {
-//       return res
-//         .status(400)
-//         .json({ error: "Ready value must be true or false" });
-//     }
-
-//     const updatedArticle = await Article.findByIdAndUpdate(
-//       id,
-//       { readyToPublish: ready },
-//       { new: true }
-//     );
-
-//     if (!updatedArticle) {
-//       return res.status(404).json({ error: "Article not found" });
-//     }
-
-//     res.status(200).json({
-//       message: `Article ${ready ? "made ready" : "made unready"} successfully`,
-//     });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(500).json({ error: error.message });
-//     } else {
-//       res.status(500).json({ error: "An unexpected error occurred" });
-//     }
-//   }
-// });
 
 export default router;

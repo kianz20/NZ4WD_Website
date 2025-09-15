@@ -20,17 +20,16 @@ import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import Cropper, { type Area } from "react-easy-crop";
-import { downloadImageFromS3, getCroppedImg } from "../utils/pageUtils";
+import {
+  downloadImageFromS3,
+  getCroppedImg,
+  getFileExtensionFromKey,
+} from "../utils/pageUtils";
 import { s3prefix } from "../constants/s3Prefix";
 import type { ArticleDetails } from "../models";
 
 const articleTypeOptions = ["news", "article", "review"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
-
-function getFileExtensionFromKey(key: string) {
-  const match = key.match(/\.(\w+)$/);
-  return match ? match[1] : "png"; // default to png if no extension
-}
 
 const ArticleEditor = () => {
   const editorRef = useRef<HTMLDivElement>(null);
