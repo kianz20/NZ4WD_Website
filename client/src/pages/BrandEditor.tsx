@@ -56,25 +56,19 @@ const BrandEditor = () => {
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    let croppedLogo;
-
-    const logoToUse = formValues.logo
-      ? formValues.logo
-      : croppedLogo ?? undefined;
-
     if (!formValues.name) {
       showToast("You must specify brand name", "error");
       return;
     }
 
-    if (!logoToUse) {
+    if (!formValues.logo) {
       showToast("you must specify brand logo", "error");
       return;
     }
 
     const transformedData: { name: string; logo: string } = {
       name: formValues.name,
-      logo: logoToUse,
+      logo: formValues.logo,
     };
 
     if (userToken) {
@@ -85,8 +79,7 @@ const BrandEditor = () => {
           await api.createBrand(transformedData, userToken);
         }
         navigate("/brandList");
-      } catch (error) {
-        console.log(error);
+      } catch {
         showToast("Save failed", "error");
       } finally {
         setLoading(false);

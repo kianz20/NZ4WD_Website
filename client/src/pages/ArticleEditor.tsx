@@ -1,17 +1,15 @@
 import {
   Autocomplete,
-  Box,
   Button,
   Checkbox,
   FormControlLabel,
-  Slider,
   TextField,
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Header, LoadingSpinner, Navbar } from "../components";
+import { Header, ImageUpload, LoadingSpinner, Navbar } from "../components";
 import Quill from "quill";
 import { useEffect, useRef, useState } from "react";
 import "quill/dist/quill.snow.css";
@@ -19,13 +17,6 @@ import dayjs from "dayjs";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
-import Cropper, { type Area } from "react-easy-crop";
-import {
-  downloadImageFromS3,
-  getCroppedImg,
-  getFileExtensionFromKey,
-} from "../utils/pageUtils";
-import { s3prefix } from "../constants/s3Prefix";
 import type { ArticleDetails } from "../models";
 
 const articleTypeOptions = ["news", "article", "review"] as const;
@@ -40,12 +31,6 @@ const ArticleEditor = () => {
   const { id } = useParams<{ id: string }>();
 
   const [loading, setLoading] = useState(false);
-
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   useEffect(() => {
     const editorNode = editorRef.current;
@@ -175,21 +160,6 @@ const ArticleEditor = () => {
         archived,
       } = formValues;
 
-      let croppedThumbnail;
-
-      if (!formValues.thumbnail) {
-        if (thumbnailFile && croppedAreaPixels) {
-          croppedThumbnail = await getCroppedImg(
-            thumbnailPreview!,
-            croppedAreaPixels
-          );
-        }
-      }
-
-      const thumbnailToUse = formValues.thumbnail
-        ? formValues.thumbnail
-        : croppedThumbnail ?? undefined;
-
       const transformedData: {
         author: string;
         title: string;
@@ -205,7 +175,7 @@ const ArticleEditor = () => {
       } = {
         author,
         title,
-        thumbnail: thumbnailToUse,
+        thumbnail: formValues.thumbnail ?? undefined,
         articleType,
         readyToPublish,
         publishDate: publishDate ? publishDate : new Date(),
@@ -229,8 +199,7 @@ const ArticleEditor = () => {
         }
 
         navigate("/articleList");
-      } catch (error) {
-        console.log(error);
+      } catch {
         showToast("Save failed", "error");
       } finally {
         setLoading(false);
@@ -335,97 +304,14 @@ const ArticleEditor = () => {
           }
           label="Ready to Publish"
         />
-        {formValues.thumbnail ? (
-          <>
-            <Typography>Thumbnail</Typography>
-            <Box component="img" src={formValues.thumbnail} />
-            <Button
-              onClick={() => {
-                setFormValues((prev) => ({
-                  ...prev,
-                  thumbnail: undefined,
-                }));
-              }}
-            >
-              Remove
-            </Button>
-            <Button
-              onClick={() => {
-                if (formValues.thumbnail) {
-                  const extension = getFileExtensionFromKey(
-                    formValues.thumbnail
-                  );
-                  downloadImageFromS3(
-                    formValues.thumbnail.replace(s3prefix, ""),
-                    `${formValues.title} article thumbnail.${extension}`
-                  );
-                }
-              }}
-            >
-              Download
-            </Button>
-          </>
-        ) : (
-          <>
-            <Box mb={2}>
-              <Button variant="contained" component="label">
-                Upload Thumbnail
-                <input
-                  hidden
-                  accept="image/*"
-                  type="file"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) {
-                      const file = e.target.files[0];
-                      setThumbnailFile(file);
-                      setThumbnailPreview(URL.createObjectURL(file));
-                    }
-                  }}
-                />
-              </Button>
-            </Box>
-            {thumbnailPreview && (
-              <Box
-                mb={2}
-                sx={{
-                  position: "relative",
-                  width: 500,
-                  height: 300,
-                  bgcolor: "#333",
-                  borderRadius: 1,
-                  overflow: "hidden",
-                }}
-              >
-                <Cropper
-                  image={thumbnailPreview}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={5 / 3}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={(_, croppedPixels) =>
-                    setCroppedAreaPixels(croppedPixels)
-                  }
-                />
-              </Box>
-            )}
-            {/* Zoom Slider */}
-            {thumbnailPreview && (
-              <Box mb={2}>
-                <Slider
-                  value={zoom}
-                  min={1}
-                  max={3}
-                  step={0.1}
-                  onChange={(_, value) => setZoom(value as number)}
-                  valueLabelDisplay="auto"
-                  marks
-                />
-              </Box>
-            )}
-          </>
-        )}
-
+        <ImageUpload
+          setOutput={(value) => {
+            if (value) handleChange("thumbnail", value);
+          }}
+          downloadFileName={`${formValues.title}-thumbnail`}
+          headingText="Thumbnail"
+          existingFile={formValues.thumbnail}
+        />
         <br />
 
         <div id="toolbar">
