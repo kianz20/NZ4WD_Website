@@ -3,5 +3,6 @@ export type { LoginResponse } from "./LoginResponse";
 export type { LoginError } from "./LoginError";
 export type { ArticleCreateIn } from "./ArticleCreateIn";
 export type { ArticleList, ArticleListObject } from "./ArticleList";
-export type { ArticleOut } from "./ArticleOut";
+export type { GenericOut } from "./GenericOut";
 export type { ArticleDetails } from "./ArticleDetails";
+export type { BrandDetails } from "./BrandDetails";

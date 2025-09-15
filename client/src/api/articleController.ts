@@ -3,38 +3,42 @@ import type {
   ArticleCreateIn,
   ArticleDetails,
   ArticleList,
-  ArticleOut,
+  GenericOut,
 } from "../models";
 import type { ArticleType } from "../pages/ArticleEditor";
 import {
   replaceContentImagesWithS3,
-  replaceThumbnailImageWithS3,
+  uploadImageSrcToS3,
 } from "../utils/apiUtil";
+
+const prepareArticleForUpload = async (
+  article: ArticleCreateIn
+): Promise<ArticleCreateIn> => {
+  const updatedContent = await replaceContentImagesWithS3(
+    article.content,
+    article.title,
+    `article/${article.title}`
+  );
+  const updatedThumbnail = article.thumbnail
+    ? await uploadImageSrcToS3(
+        article.thumbnail,
+        `${article.title}-thumbnail`,
+        `/article/${article.title}`
+      )
+    : undefined;
+
+  return {
+    ...article,
+    content: updatedContent,
+    thumbnail: updatedThumbnail,
+  };
+};
 
 export const createArticle = async (
   article: ArticleCreateIn,
   token: string
-): Promise<ArticleOut> => {
-  const updatedContent = await replaceContentImagesWithS3(
-    article.content,
-    article.title
-  );
-
-  let updatedThumbail;
-
-  if (article.thumbnail) {
-    updatedThumbail = await replaceThumbnailImageWithS3(
-      article.thumbnail,
-      article.title
-    );
-  }
-
-  const updatedArticle: ArticleCreateIn = {
-    ...article,
-    content: updatedContent,
-    thumbnail: article.thumbnail ? updatedThumbail : undefined,
-  };
-
+): Promise<GenericOut> => {
+  const updatedArticle = await prepareArticleForUpload(article);
   const response = await fetch(`${BACKEND_URL}/api/articles/`, {
     method: "POST",
     headers: {
@@ -43,40 +47,17 @@ export const createArticle = async (
     },
     body: JSON.stringify(updatedArticle),
   });
-
-  if (!response.ok) {
+  if (!response.ok)
     throw new Error(`Failed to fetch articles: ${response.statusText}`);
-  }
-
-  const data: ArticleOut = await response.json();
-  return data;
+  return response.json();
 };
 
 export const updateArticle = async (
   id: string,
   article: ArticleCreateIn,
   token: string
-): Promise<ArticleOut> => {
-  const updatedContent = await replaceContentImagesWithS3(
-    article.content,
-    article.title
-  );
-
-  let updatedThumbail;
-
-  if (article.thumbnail) {
-    updatedThumbail = await replaceThumbnailImageWithS3(
-      article.thumbnail,
-      article.title
-    );
-  }
-
-  const updatedArticle: ArticleCreateIn = {
-    ...article,
-    content: updatedContent,
-    thumbnail: article.thumbnail ? updatedThumbail : undefined,
-  };
-
+): Promise<GenericOut> => {
+  const updatedArticle = await prepareArticleForUpload(article);
   const response = await fetch(`${BACKEND_URL}/api/articles/${id}`, {
     method: "PUT",
     headers: {
@@ -85,13 +66,9 @@ export const updateArticle = async (
     },
     body: JSON.stringify(updatedArticle),
   });
-
-  if (!response.ok) {
+  if (!response.ok)
     throw new Error(`Failed to update article: ${response.statusText}`);
-  }
-
-  const data: ArticleOut = await response.json();
-  return data;
+  return response.json();
 };
 
 export const getArticles = async (
@@ -135,7 +112,7 @@ export const getArticle = async (id: string): Promise<ArticleDetails> => {
 export const deleteArticle = async (
   token: string,
   id: string
-): Promise<ArticleOut> => {
+): Promise<GenericOut> => {
   const response = await fetch(`${BACKEND_URL}/api/articles/delete/${id}`, {
     method: "DELETE",
     headers: {
@@ -148,7 +125,7 @@ export const deleteArticle = async (
     throw new Error(`Failed to delete article: ${response.statusText}`);
   }
 
-  const data: ArticleOut = await response.json();
+  const data: GenericOut = await response.json();
   return data;
 };
 
@@ -156,7 +133,7 @@ export const archiveArticle = async (
   token: string,
   id: string,
   archive: boolean
-): Promise<ArticleOut> => {
+): Promise<GenericOut> => {
   const response = await fetch(`${BACKEND_URL}/api/articles/archive/${id}`, {
     method: "PUT",
     headers: {
@@ -170,7 +147,7 @@ export const archiveArticle = async (
     throw new Error(`Failed to archive article: ${response.statusText}`);
   }
 
-  const data: ArticleOut = await response.json();
+  const data: GenericOut = await response.json();
   return data;
 };
 
@@ -178,7 +155,7 @@ export const readyArticle = async (
   token: string,
   id: string,
   ready: boolean
-): Promise<ArticleOut> => {
+): Promise<GenericOut> => {
   const response = await fetch(`${BACKEND_URL}/api/articles/ready/${id}`, {
     method: "PUT",
     headers: {
@@ -192,6 +169,6 @@ export const readyArticle = async (
     throw new Error(`Failed to ready article: ${response.statusText}`);
   }
 
-  const data: ArticleOut = await response.json();
+  const data: GenericOut = await response.json();
   return data;
 };

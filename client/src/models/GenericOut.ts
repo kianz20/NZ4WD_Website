@@ -1,4 +1,4 @@
-export interface ArticleOut {
+export interface GenericOut {
   message?: string;
   error?: string;
 }

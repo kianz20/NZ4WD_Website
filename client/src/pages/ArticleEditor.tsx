@@ -160,10 +160,10 @@ const ArticleEditor = () => {
   }, [id, userToken]);
 
   const handleSave = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (userToken) {
       setLoading(true);
 
-      event.preventDefault();
       const {
         author,
         publishDate,
