@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import * as api from "../api/articleController";
 import { type ArticleDetails } from "../models";
 import DOMPurify from "dompurify";
+import styles from "../styles/Article.module.css";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,16 +32,10 @@ const Article = () => {
       <Header />
       <Navbar />
       <HeadlineBanner />
-      <Typography variant="h4" component="h1">
-        Article
-      </Typography>
       {article ? (
         <>
-          <Typography variant="h4" component="h1">
+          <Typography className={styles.title}>
             {article.title}
-          </Typography>
-          <Typography component="h1" sx={{ fontStyle: "italic" }}>
-            {article.shortDescription}
           </Typography>
           <Typography sx={{ fontStyle: "italic", fontSize: "13px" }}>
             {`Published by ${article.author} on ${article.publishDate}`}
