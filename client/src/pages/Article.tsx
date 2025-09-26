@@ -37,11 +37,12 @@ const Article = () => {
           <Typography className={styles.title}>
             {article.title}
           </Typography>
-          <Typography sx={{ fontStyle: "italic", fontSize: "13px" }}>
-            {`Published by ${article.author} on ${article.publishDate}`}
+          <Typography sx={{ fontStyle: "italic", fontSize: "14px" }}>
+            {`Published by ${article.author} on ${new Date(article.publishDate).toLocaleString()}`}
           </Typography>
           <Box component="img" src={article.thumbnail} />
           <Typography
+          className={styles.bodyText}
             sx={{ fontSize: "13px" }}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(article.content),
