@@ -5,6 +5,7 @@ import { useToast } from "../hooks";
 import * as api from "../api/articleController";
 import { type ArticleList } from "../models";
 import { ArticleGrid } from "../components";
+import PageTitle from "../components/PageTitle";
 
 interface ArticleProps {
   articleFilter?: "news" | "article" | "review";
@@ -40,10 +41,6 @@ const Articles = (props: ArticleProps) => {
       <Header />
       <Navbar />
       <HeadlineBanner />
-      <Typography variant="h4" component="h1">
-        Articles
-      </Typography>
-
       <ArticleGrid articleList={articles} />
     </>
   );
