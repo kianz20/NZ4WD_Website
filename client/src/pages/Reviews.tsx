@@ -3,7 +3,7 @@ import Articles from "./Articles";
 const Reviews = () => {
   return (
     <>
-      <Articles articleFilter="review" />
+      <Articles articleFilter="review" pageTitle="Reviews" />
     </>
   );
 };

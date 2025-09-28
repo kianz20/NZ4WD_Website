@@ -1,43 +1,5 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.pageTitle {
+  font-family: Arial, sans-serif !important;
+  font-size: 40px !important;
+  font-weight: bold !important;
 }
-
-body {
-  font-family: "Arial", sans-serif;
-  font-size: 16px; /* Base body text size */
-  color: #111;
-  line-height: 1.6;
-  background-color: #fff;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  color: #111;
-}
-
-h1 {
-  font-size: 2.5rem;
-} /* ~40px */
-h2 {
-  font-size: 2rem;
-} /* ~32px */
-h3 {
-  font-size: 1.75rem;
-} /* ~28px */
-h4 {
-  font-size: 1.5rem;
-} /* ~24px */
-h5 {
-  font-size: 1.25rem;
-} /* ~20px */
-h6 {
-  font-size: 1rem;
-} /* ~16px */

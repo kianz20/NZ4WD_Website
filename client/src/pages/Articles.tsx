@@ -8,7 +8,8 @@ import { ArticleGrid } from "../components";
 import PageTitle from "../components/PageTitle";
 
 interface ArticleProps {
-  articleFilter?: "news" | "article" | "review";
+  pageTitle: string;
+  articleFilter?: "news" | "article" | "review" | "brands";
 }
 
 const Articles = (props: ArticleProps) => {
@@ -41,6 +42,7 @@ const Articles = (props: ArticleProps) => {
       <Header />
       <Navbar />
       <HeadlineBanner />
+      <PageTitle text={props.pageTitle} />
       <ArticleGrid articleList={articles} />
     </>
   );

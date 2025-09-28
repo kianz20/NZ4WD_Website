@@ -1,14 +1,9 @@
-import { Typography } from "@mui/material";
-import { Header, HeadlineBanner, Navbar } from "../components";
+import Articles from "./Articles";
+
 const Brands = () => {
   return (
     <>
-      <Header />
-      <Navbar />
-      <HeadlineBanner />
-      <Typography variant="h4" component="h1">
-        Brands
-      </Typography>
+      <Articles articleFilter="brands" pageTitle={"Brands"} />
     </>
   );
 };
