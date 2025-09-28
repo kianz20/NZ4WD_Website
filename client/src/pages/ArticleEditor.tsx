@@ -10,9 +10,9 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Header, ImageUpload, LoadingSpinner, Navbar } from "../components";
-import Quill from "quill";
-import { useEffect, useRef, useState } from "react";
-import "quill/dist/quill.snow.css";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
@@ -22,75 +22,31 @@ import type { ArticleDetails } from "../models";
 const articleTypeOptions = ["news", "article", "review"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
 
+const Quill = ReactQuill.Quill;
+
+const icons = Quill.import("ui/icons") as Record<string, string>;
+icons["hr"] = "―";
+
+// 2. Get the base class for block-level embeds
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const BlockEmbed = Quill.import("blots/block/embed") as any;
+
+// 3. Define your custom HR blot
+class HorizontalRule extends BlockEmbed {
+  static blotName = "hr";
+  static tagName = "hr";
+}
+
+// 4. Register the new blot with Quill
+Quill.register(HorizontalRule);
+
 const ArticleEditor = () => {
-  const editorRef = useRef<HTMLDivElement>(null);
-  const quillRef = useRef<Quill | null>(null);
+  const quillRef = useRef<ReactQuill | null>(null);
   const { authorName, userToken } = useRequireAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const editorNode = editorRef.current;
-    if (editorNode && !quillRef.current) {
-      quillRef.current = new Quill(editorNode, {
-        theme: "snow",
-        modules: {
-          toolbar: {
-            container: "#toolbar",
-            handlers: {
-              image: () => {
-                const input = document.createElement("input");
-                input.setAttribute("type", "file");
-                input.setAttribute("accept", "image/*");
-                input.click();
-
-                input.onchange = () => {
-                  const file = input.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      const quill = quillRef.current;
-                      if (quill) {
-                        const range = quill.getSelection();
-                        const index = range ? range.index : quill.getLength();
-                        quill.insertEmbed(index, "image", reader.result);
-                        quill.setSelection(index + 1);
-                      }
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                };
-              },
-            },
-          },
-        },
-      });
-    }
-
-    return () => {
-      if (editorNode) {
-        editorNode.innerHTML = "";
-      }
-      quillRef.current = null;
-    };
-  }, []);
-
-  const getContent = () => {
-    if (quillRef.current) {
-      const html = quillRef.current.root.innerHTML;
-      return html;
-    }
-  };
-
-  const getTextContent = () => {
-    if (quillRef.current) {
-      const textContent = quillRef.current.root.textContent;
-      return textContent;
-    }
-  };
 
   const [formValues, setFormValues] = useState<ArticleDetails>({
     author: "",
@@ -110,6 +66,64 @@ const ArticleEditor = () => {
   ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handleQuillChange = (content: string) => {
+    handleChange("content", content);
+  };
+
+  const quillModules = useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+          ["bold", "italic", "underline", "strike", "blockquote"],
+          // This line adds the color and background/highlight options
+          [{ color: [] }, { background: [] }],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link", "image", "hr"],
+          ["clean"],
+        ],
+        handlers: {
+          hr: () => {
+            const quill = quillRef.current?.getEditor();
+            if (quill) {
+              const range = quill.getSelection();
+              const index = range ? range.index : quill.getLength();
+              // Insert <hr> as HTML
+              quill.insertEmbed(index, "hr", true, "user");
+              quill.setSelection(index + 1, 0);
+            }
+          },
+          image: () => {
+            const input = document.createElement("input");
+            input.setAttribute("type", "file");
+            input.setAttribute("accept", "image/*");
+            input.click();
+
+            input.onchange = () => {
+              const file = input.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  // Get the editor instance from the ref
+                  const quill = quillRef.current?.getEditor();
+                  if (quill) {
+                    const range = quill.getSelection();
+                    const index = range ? range.index : quill.getLength();
+                    // Insert the image as a base64 string
+                    quill.insertEmbed(index, "image", reader.result);
+                    quill.setSelection(index + 1, 0);
+                  }
+                };
+                reader.readAsDataURL(file);
+              }
+            };
+          },
+        },
+      },
+    }),
+    []
+  );
 
   useEffect(() => {
     if (authorName) {
@@ -132,13 +146,11 @@ const ArticleEditor = () => {
             hiddenTags: data.tags,
             articleType: data.articleType,
             shortDescription: data.shortDescription,
-            content: data.content,
+            content: data.content, // CHANGE 6: Simply set the content in state
             archived: data.archived,
             thumbnail: data.thumbnail,
           });
-          if (quillRef.current && data.content) {
-            quillRef.current.clipboard.dangerouslyPasteHTML(data.content);
-          }
+          // The line for `dangerouslyPasteHTML` is no longer needed.
         })
         .catch(() => {
           showToast("Failed to load article", "error");
@@ -165,12 +177,13 @@ const ArticleEditor = () => {
         articleType,
         shortDescription,
         archived,
+        content, // The content is now directly from the state
       } = formValues;
 
-      const textContent = getTextContent();
-      const htmlContent = getContent();
+      // CHANGE 7: Get plain text content from the ref for validation
+      const textContent = quillRef.current?.getEditor().getText();
 
-      if (!textContent?.trim() || !htmlContent) {
+      if (!textContent?.trim() || !content) {
         showToast("Article content cannot be empty", "error");
         setLoading(false);
         return;
@@ -195,7 +208,7 @@ const ArticleEditor = () => {
         articleType,
         readyToPublish,
         publishDate: publishDate ? publishDate : new Date(),
-        content: htmlContent,
+        content, // Use content from state
         tags,
         hiddenTags,
         archived,
@@ -213,7 +226,6 @@ const ArticleEditor = () => {
           await api.createArticle(transformedData, userToken);
           showToast("Article Created", "success");
         }
-
         navigate("/articleList");
       } catch {
         showToast("Save failed", "error");
@@ -229,10 +241,11 @@ const ArticleEditor = () => {
       <Header />
       <Navbar />
       <Typography variant="h4" component="h1">
-        New Article
+        {id ? "Edit Article" : "New Article"}
       </Typography>
       <br />
       <form onSubmit={handleSave}>
+        {/* All form fields remain the same */}
         <TextField
           label="Author"
           name="author"
@@ -310,14 +323,13 @@ const ArticleEditor = () => {
           multiline
           rows={2}
           onChange={(e) => handleChange("shortDescription", e.target.value)}
-          required
         />
         <br />
         <FormControlLabel
           control={
             <Checkbox
               name="readyToPublish"
-              checked={formValues.readyToPublish} // use checked instead of value
+              checked={formValues.readyToPublish}
               onChange={(e) => handleChange("readyToPublish", e.target.checked)}
             />
           }
@@ -333,22 +345,15 @@ const ArticleEditor = () => {
         />
         <br />
 
-        <div id="toolbar">
-          <button className="ql-bold" />
-          <button className="ql-italic" />
-          <button className="ql-underline" />
-          {/* <select className="ql-header">
-          <option value="1">Heading 1</option>
-          <option value="2">Heading 2</option>
-          <option value="">Normal</option>
-        </select> */}
-          <button className="ql-image" />
-          <button className="ql-code-block" />
-        </div>
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={formValues.content}
+          onChange={handleQuillChange}
+          modules={quillModules}
+          style={{ height: 400, marginBottom: "50px" }}
+        />
 
-        <div ref={editorRef} style={{ height: 400 }} />
-
-        <br />
         <Button variant="outlined" type="submit">
           Save
         </Button>
