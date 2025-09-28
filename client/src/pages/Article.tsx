@@ -6,6 +6,7 @@ import * as api from "../api/articleController";
 import { type ArticleDetails } from "../models";
 import DOMPurify from "dompurify";
 import styles from "../styles/Article.module.css";
+import PageTitle from "../components/PageTitle";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,15 +35,15 @@ const Article = () => {
       <HeadlineBanner />
       {article ? (
         <>
-          <Typography className={styles.title}>
-            {article.title}
-          </Typography>
+          <PageTitle text={article.title} />
           <Typography sx={{ fontStyle: "italic", fontSize: "14px" }}>
-            {`Published by ${article.author} on ${new Date(article.publishDate).toLocaleString()}`}
+            {`Published by ${article.author} on ${new Date(
+              article.publishDate
+            ).toLocaleString()}`}
           </Typography>
           <Box component="img" src={article.thumbnail} />
           <Typography
-          className={styles.bodyText}
+            className={styles.bodyText}
             sx={{ fontSize: "13px" }}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(article.content),
