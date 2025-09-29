@@ -32,7 +32,7 @@ const SearchBar = () => {
     if (userToken) {
       setLoading(true);
       api
-        .getArticles(userToken, true)
+        .getArticles(true)
         .then((data) => setArticleList(data))
         .finally(() => setLoading(false));
     }
