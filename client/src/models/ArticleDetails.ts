@@ -1,8 +1,10 @@
+import type { ArticleType } from "../pages/ArticleEditor";
+
 export interface ArticleDetails {
   author: string;
   title: string;
   thumbnail?: string;
-  articleType: "news" | "article" | "review" | "brands";
+  articleType: ArticleType;
   shortDescription?: string;
   readyToPublish: boolean;
   publishDate: Date;

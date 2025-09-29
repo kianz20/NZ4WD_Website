@@ -1,4 +1,3 @@
-import { Typography } from "@mui/material";
 import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
 import { useEffect, useState } from "react";
 import { useToast } from "../hooks";
@@ -6,10 +5,11 @@ import * as api from "../api/articleController";
 import { type ArticleList } from "../models";
 import { ArticleGrid } from "../components";
 import PageTitle from "../components/PageTitle";
+import type { ArticleType } from "./ArticleEditor";
 
 interface ArticleProps {
   pageTitle: string;
-  articleFilter?: "news" | "article" | "review" | "brands";
+  articleFilter?: ArticleType;
 }
 
 const Articles = (props: ArticleProps) => {

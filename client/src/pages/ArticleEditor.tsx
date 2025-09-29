@@ -202,7 +202,7 @@ const ArticleEditor = () => {
         author: string;
         title: string;
         thumbnail: string | undefined;
-        articleType: "news" | "article" | "review" | "brands";
+        articleType: ArticleType;
         readyToPublish: boolean;
         publishDate: Date;
         content: string;
