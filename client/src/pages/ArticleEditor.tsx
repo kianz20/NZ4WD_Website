@@ -18,6 +18,7 @@ import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import type { ArticleDetails } from "../models";
+import { ImageResize } from "quill-image-resize-module-ts";
 
 const articleTypeOptions = ["news", "article", "review", "brands"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
@@ -39,6 +40,7 @@ class HorizontalRule extends BlockEmbed {
 
 // 4. Register the new blot with Quill
 Quill.register(HorizontalRule);
+Quill.register("modules/imageResize", ImageResize);
 
 const ArticleEditor = () => {
   const quillRef = useRef<ReactQuill | null>(null);
@@ -121,6 +123,10 @@ const ArticleEditor = () => {
           },
         },
       },
+      imageResize: {
+        parchment: Quill.import("parchment"),
+        modules: ["Resize", "DisplaySize"], // Allows resizing and shows dimensions
+      },
     }),
     []
   );
@@ -165,8 +171,6 @@ const ArticleEditor = () => {
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
     if (userToken) {
-      setLoading(true);
-
       const {
         author,
         publishDate,
@@ -178,6 +182,7 @@ const ArticleEditor = () => {
         shortDescription,
         archived,
         content, // The content is now directly from the state
+        thumbnail,
       } = formValues;
 
       // CHANGE 7: Get plain text content from the ref for validation
@@ -185,7 +190,11 @@ const ArticleEditor = () => {
 
       if (!textContent?.trim() || !content) {
         showToast("Article content cannot be empty", "error");
-        setLoading(false);
+        return;
+      }
+
+      if (!thumbnail) {
+        showToast("You must upload a thumbnail", "error");
         return;
       }
 
@@ -204,10 +213,10 @@ const ArticleEditor = () => {
       } = {
         author,
         title,
-        thumbnail: formValues.thumbnail ?? undefined,
+        thumbnail,
         articleType,
         readyToPublish,
-        publishDate: publishDate ? publishDate : new Date(),
+        publishDate,
         content, // Use content from state
         tags,
         hiddenTags,
@@ -217,6 +226,8 @@ const ArticleEditor = () => {
       if (shortDescription && shortDescription.trim() !== "") {
         transformedData.shortDescription = shortDescription;
       }
+
+      setLoading(true);
 
       try {
         if (id) {
@@ -338,6 +349,7 @@ const ArticleEditor = () => {
         <ImageUpload
           setOutput={(value) => {
             if (value) handleChange("thumbnail", value);
+            else if (value === null) handleChange("thumbnail", undefined);
           }}
           downloadFileName={`${formValues.title}-thumbnail`}
           headingText="Thumbnail"
@@ -351,7 +363,7 @@ const ArticleEditor = () => {
           value={formValues.content}
           onChange={handleQuillChange}
           modules={quillModules}
-          style={{ height: 400, marginBottom: "50px" }}
+          style={{ height: 1000, marginBottom: "50px" }}
         />
 
         <Button variant="outlined" type="submit">

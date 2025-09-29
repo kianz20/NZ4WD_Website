@@ -66,7 +66,7 @@ const ImageUpload = (props: ImageUploadProps) => {
         <>
           <Box mb={2}>
             <Button variant="contained" component="label">
-              Upload Logo
+              Upload Image
               <input
                 hidden
                 accept="image/*"

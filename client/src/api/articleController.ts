@@ -23,7 +23,7 @@ const prepareArticleForUpload = async (
     ? await uploadImageSrcToS3(
         article.thumbnail,
         `${article.title}-thumbnail`,
-        `/article/${article.title}`
+        `article/${article.title}`
       )
     : undefined;
 
