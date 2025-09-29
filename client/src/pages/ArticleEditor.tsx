@@ -9,7 +9,13 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Header, ImageUpload, LoadingSpinner, Navbar } from "../components";
+import {
+  CategoriesMultiselect,
+  Header,
+  ImageUpload,
+  LoadingSpinner,
+  Navbar,
+} from "../components";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -17,7 +23,7 @@ import dayjs from "dayjs";
 import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
-import type { ArticleDetails } from "../models";
+import type { ArticleDetails, Category } from "../models";
 import { ImageResize } from "quill-image-resize-module-ts";
 
 const articleTypeOptions = ["news", "article", "review", "brands"] as const;
@@ -55,8 +61,8 @@ const ArticleEditor = () => {
     publishDate: dayjs().toDate(),
     title: "",
     readyToPublish: false,
+    categories: [],
     tags: [],
-    hiddenTags: [],
     articleType: "article",
     content: "",
     archived: false,
@@ -148,15 +154,14 @@ const ArticleEditor = () => {
             publishDate: data.publishDate,
             readyToPublish: data.readyToPublish,
             title: data.title,
+            categories: data.categories,
             tags: data.tags,
-            hiddenTags: data.tags,
             articleType: data.articleType,
             shortDescription: data.shortDescription,
-            content: data.content, // CHANGE 6: Simply set the content in state
+            content: data.content,
             archived: data.archived,
             thumbnail: data.thumbnail,
           });
-          // The line for `dangerouslyPasteHTML` is no longer needed.
         })
         .catch(() => {
           showToast("Failed to load article", "error");
@@ -176,8 +181,8 @@ const ArticleEditor = () => {
         publishDate,
         title,
         readyToPublish,
+        categories,
         tags,
-        hiddenTags,
         articleType,
         shortDescription,
         archived,
@@ -206,8 +211,8 @@ const ArticleEditor = () => {
         readyToPublish: boolean;
         publishDate: Date;
         content: string;
+        categories: Category[];
         tags: string[];
-        hiddenTags: string[];
         shortDescription?: string;
         archived: boolean;
       } = {
@@ -218,8 +223,8 @@ const ArticleEditor = () => {
         readyToPublish,
         publishDate,
         content, // Use content from state
+        categories,
         tags,
-        hiddenTags,
         archived,
       };
 
@@ -285,6 +290,14 @@ const ArticleEditor = () => {
         />
         <br />
         <br />
+        <CategoriesMultiselect
+          setLoading={setLoading}
+          value={formValues.categories}
+          onChange={(newCategories) => {
+            handleChange("categories", newCategories);
+          }}
+        />
+        <br />
         <Autocomplete
           sx={{ width: 500 }}
           multiple
@@ -293,18 +306,6 @@ const ArticleEditor = () => {
           value={formValues.tags}
           onChange={(_, newValue) => handleChange("tags", newValue)}
           renderInput={(params) => <TextField {...params} label="Tags" />}
-        />
-        <br />
-        <Autocomplete
-          sx={{ width: 500 }}
-          multiple
-          freeSolo
-          options={[]}
-          value={formValues.hiddenTags}
-          onChange={(_, newValue) => handleChange("hiddenTags", newValue)}
-          renderInput={(params) => (
-            <TextField {...params} label="Hidden Tags" />
-          )}
         />
         <br />
         <Autocomplete

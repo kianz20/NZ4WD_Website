@@ -1,3 +1,4 @@
+import type { Category } from ".";
 import type { ArticleType } from "../pages/ArticleEditor";
 
 export interface ArticleDetails {
@@ -9,7 +10,7 @@ export interface ArticleDetails {
   readyToPublish: boolean;
   publishDate: Date;
   content: string;
+  categories: Category[];
   tags: string[];
-  hiddenTags: string[];
   archived: boolean;
 }

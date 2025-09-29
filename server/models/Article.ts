@@ -1,13 +1,18 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+interface Category {
+  category: string;
+  parentCategory: string;
+}
+
 interface Article extends Document {
   author: string;
   title: string;
   content: string;
   thumbnail: string;
+  categories: Category[];
   tags: string[];
-  hiddenTags: string[];
-  articleType: "news" | "article" | "review";
+  articleType: "news" | "article" | "review" | "brands";
   shortDescription?: string;
   readyToPublish: boolean;
   publishDate: Date;
@@ -21,11 +26,19 @@ const ArticleSchema: Schema<Article> = new Schema(
     title: { type: String, required: true },
     content: { type: String, required: true },
     thumbnail: { type: String },
+    categories: {
+      type: [
+        {
+          category: { type: String, required: true },
+          parentCategory: { type: String, required: true },
+        },
+      ],
+      default: [],
+    },
     tags: { type: [String], default: [] },
-    hiddenTags: { type: [String], default: [] },
     articleType: {
       type: String,
-      enum: ["news", "article", "review"],
+      enum: ["news", "article", "review", "brands"],
       required: true,
     },
     shortDescription: { type: String, required: false },
