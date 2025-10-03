@@ -9,3 +9,4 @@ export { default as ArticleGrid } from "./ArticleGrid";
 export { default as SearchBar } from "./SearchBar";
 export { default as ImageUpload } from "./ImageUpload";
 export { default as CategoriesMultiselect } from "./CategorySelector/CategoriesMultiselect";
+export { default as GalleryPhoto } from "./GalleryPhoto/GalleryPhoto";

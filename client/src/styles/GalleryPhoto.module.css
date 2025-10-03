@@ -1,0 +1,16 @@
+.galleryPhoto {
+  height: 100px;
+  width: 150px;
+  padding-right: 5px;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.galleryPhoto:hover {
+  transform: scale(1.05); /* grows 5% */
+}
+
+.focusedImage {
+  width: 75vw;
+}

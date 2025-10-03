@@ -14,13 +14,13 @@ const s3 = new S3Client({
   credentials: fromEnv(),
 });
 
-const BUCKET = process.env.REACT_APP_S3_BUCKET;
+const bucket = process.env.REACT_APP_S3_BUCKET || "nz4wd-images";
 
 router.post("/", async (req, res) => {
   const { filename, type } = req.body;
 
   const command = new PutObjectCommand({
-    Bucket: BUCKET,
+    Bucket: bucket,
     Key: filename,
     ContentType: type,
   });
@@ -38,7 +38,7 @@ router.get("/download", async (req, res) => {
   if (!key) return res.status(400).json({ error: "Missing key" });
 
   const command = new GetObjectCommand({
-    Bucket: BUCKET,
+    Bucket: bucket,
     Key: key as string,
   });
 
@@ -55,10 +55,10 @@ router.get("/all", async (req, res) => {
     const { continuationToken, maxKeys } = req.query;
 
     const command = new ListObjectsV2Command({
-      Bucket: BUCKET,
+      Bucket: bucket,
       Prefix: "article/",
       ContinuationToken: continuationToken as string | undefined,
-      MaxKeys: maxKeys ? parseInt(maxKeys as string, 10) : 100, // default batch size
+      MaxKeys: maxKeys ? parseInt(maxKeys as string, 10) : 100,
     });
 
     const data = await s3.send(command);
@@ -73,7 +73,7 @@ router.get("/all", async (req, res) => {
         const url = await getSignedUrl(
           s3,
           new GetObjectCommand({
-            Bucket: BUCKET,
+            Bucket: bucket,
             Key: obj.Key!,
           }),
           { expiresIn: 60 }

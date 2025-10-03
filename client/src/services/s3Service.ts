@@ -127,9 +127,28 @@ async function uploadImageSrcToS3(
   return s3Url;
 }
 
+async function getAllMedia(continuationToken?: string): Promise<{
+  files: { key: string; url: string }[];
+  nextContinuationToken?: string;
+}> {
+  const params = new URLSearchParams();
+  if (continuationToken) params.append("continuationToken", continuationToken);
+  params.append("maxKeys", "100");
+
+  const res = await fetch(`${BACKEND_URL}/api/s3/all?${params.toString()}`);
+  if (!res.ok) throw new Error("Failed to fetch media");
+
+  const data = await res.json();
+  return {
+    files: data.files,
+    nextContinuationToken: data.nextContinuationToken,
+  };
+}
+
 export {
   base64ToFile,
   uploadFileToS3,
   replaceContentImagesWithS3,
   uploadImageSrcToS3,
+  getAllMedia,
 };
