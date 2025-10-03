@@ -13,26 +13,37 @@ import {
   ArticleList,
   BrandEditor,
   BrandList,
+  Dashboard,
+  MediaLibrary,
 } from "./pages";
+import { ROUTES } from "./constants/routes";
 
 const App = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/latestNews" element={<LatestNews />} />
-        <Route path="/articles" element={<Articles pageTitle="Articles" />} />
-        <Route path="/articleEditor" element={<ArticleEditor />} />
-        <Route path="/articleEditor/:id" element={<ArticleEditor />} />
-        <Route path="/articleList" element={<ArticleList />} />
-        <Route path="/article/:id" element={<Article />} />
-        <Route path="/reviews" element={<Reviews />} />
-        <Route path="/brands" element={<Brands />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/brandEditor" element={<BrandEditor />} />
-        <Route path="/brandEditor/:id" element={<BrandEditor />} />
-        <Route path="/brandList" element={<BrandList />} />
+        <Route path={ROUTES.HOME} element={<Home />} />
+        <Route path={ROUTES.LATEST_NEWS} element={<LatestNews />} />
+        <Route
+          path={ROUTES.ARTICLES}
+          element={<Articles pageTitle="Articles" />}
+        />
+        <Route path={ROUTES.ARTICLE_EDITOR} element={<ArticleEditor />} />
+        <Route
+          path={ROUTES.ARTICLE_EDITOR_WITH_ID}
+          element={<ArticleEditor />}
+        />
+        <Route path={ROUTES.ARTICLE_LIST} element={<ArticleList />} />
+        <Route path={ROUTES.ARTICLE} element={<Article />} />
+        <Route path={ROUTES.REVIEWS} element={<Reviews />} />
+        <Route path={ROUTES.BRANDS} element={<Brands />} />
+        <Route path={ROUTES.ABOUT} element={<About />} />
+        <Route path={ROUTES.CONTACT} element={<Contact />} />
+        <Route path={ROUTES.BRAND_EDITOR} element={<BrandEditor />} />
+        <Route path={ROUTES.BRAND_EDITOR_WITH_ID} element={<BrandEditor />} />
+        <Route path={ROUTES.BRAND_LIST} element={<BrandList />} />
+        <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+        <Route path={ROUTES.MEDIA_LIBRARY} element={<MediaLibrary />} />
       </Routes>
     </>
   );

@@ -5,6 +5,7 @@ import * as api from "../api/articleController";
 import { useRequireAuth, useToast } from "../hooks";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 interface ArticleGridRows {
   id: string;
@@ -165,7 +166,7 @@ const ArticleList = () => {
   }, [userToken]);
 
   const handleEdit = (id: string) => {
-    navigate(`/articleEditor/${id}`);
+    navigate(ROUTES.ARTICLE_EDITOR_WITH_ID.replace(":id", id));
   };
 
   // 2. CREATE a new function to process the "ready" toggle

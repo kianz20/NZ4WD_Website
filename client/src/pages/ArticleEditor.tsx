@@ -25,6 +25,7 @@ import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
 import type { ArticleDetails, Category } from "../models";
 import { ImageResize } from "quill-image-resize-module-ts";
+import { ROUTES } from "../constants/routes";
 
 const articleTypeOptions = ["news", "article", "review", "brands"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
@@ -242,7 +243,7 @@ const ArticleEditor = () => {
           await api.createArticle(transformedData, userToken);
           showToast("Article Created", "success");
         }
-        navigate("/articleList");
+        navigate(ROUTES.ARTICLE_LIST);
       } catch {
         showToast("Save failed", "error");
       } finally {

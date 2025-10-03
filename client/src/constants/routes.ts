@@ -1,0 +1,18 @@
+export const ROUTES = {
+  HOME: "/",
+  LATEST_NEWS: "/latestNews",
+  ARTICLES: "/articles",
+  ARTICLE_EDITOR: "/articleEditor",
+  ARTICLE_EDITOR_WITH_ID: "/articleEditor/:id",
+  ARTICLE_LIST: "/articleList",
+  ARTICLE: "/article/:id",
+  REVIEWS: "/reviews",
+  BRANDS: "/brands",
+  ABOUT: "/about",
+  CONTACT: "/contact",
+  BRAND_EDITOR: "/brandEditor",
+  BRAND_EDITOR_WITH_ID: "/brandEditor/:id",
+  BRAND_LIST: "/brandList",
+  DASHBOARD: "/dashboard",
+  MEDIA_LIBRARY: "/mediaLibrary",
+};

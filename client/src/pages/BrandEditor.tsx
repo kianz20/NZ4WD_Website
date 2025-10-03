@@ -11,6 +11,7 @@ import type { BrandDetails } from "../models";
 import { useRequireAuth, useToast } from "../hooks";
 import * as api from "../api/brandController";
 import { useNavigate, useParams } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 const BrandEditor = () => {
   const { userToken } = useRequireAuth();
@@ -73,7 +74,7 @@ const BrandEditor = () => {
         } else {
           await api.createBrand(transformedData, userToken);
         }
-        navigate("/brandList");
+        navigate(ROUTES.BRAND_LIST);
       } catch {
         showToast("Save failed", "error");
       } finally {

@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import type { ArticleListObject } from "../models";
 import styles from "../styles/ArticleGridCell.module.css";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 interface ArticleGridCellProps {
   article: ArticleListObject;
@@ -16,7 +17,7 @@ const ArticleGridCell = ({ article, zoom }: ArticleGridCellProps) => {
         className={styles.gridCell}
         sx={{ width: zoom * 5, height: zoom * 3 }}
         onClick={() => {
-          navigate(`/article/${article._id}`);
+          navigate(ROUTES.ARTICLE.replace(":id", article._id));
         }}
       >
         <Box

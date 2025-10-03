@@ -5,6 +5,7 @@ import * as api from "../api/brandController";
 import { useRequireAuth, useToast } from "../hooks";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 interface BrandGridRows {
   id: string;
@@ -70,7 +71,7 @@ const BrandList = () => {
   }, [userToken]);
 
   const handleEdit = (id: string) => {
-    navigate(`/brandEditor/${id}`);
+    navigate(ROUTES.BRAND_EDITOR.replace(":id", id));
   };
 
   const columns: GridColDef<BrandGridRows>[] = [

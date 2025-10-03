@@ -7,6 +7,7 @@ import * as api from "../api/articleController";
 import { useRequireAuth } from "../hooks";
 import styles from "../styles/SearchBar.module.css";
 import SearchResult from "./SearchResult";
+import { ROUTES } from "../constants/routes";
 
 export interface Article {
   _id: string;
@@ -79,7 +80,7 @@ const SearchBar = () => {
       onChange={(_, newValue: Article | null) => {
         setValue(newValue);
         if (newValue) {
-          navigate(`/article/${newValue._id}`);
+          navigate(ROUTES.ARTICLE.replace(":id", newValue._id));
         }
       }}
       renderOption={(props, option) => (

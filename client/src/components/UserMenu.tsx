@@ -1,6 +1,7 @@
 import { Box, Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 const UserMenu = ({ username }: { username: string }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -21,14 +22,24 @@ const UserMenu = ({ username }: { username: string }) => {
         {username}
       </Box>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={() => navigate("/articleList")}>
+        <MenuItem onClick={() => navigate(ROUTES.ARTICLE_LIST)}>
           All Articles
         </MenuItem>
-        <MenuItem onClick={() => navigate("/articleEditor")}>
+        <MenuItem onClick={() => navigate(ROUTES.ARTICLE_EDITOR)}>
           New Article
         </MenuItem>
-        <MenuItem onClick={() => navigate("/brandList")}>All Brands</MenuItem>
-        <MenuItem onClick={() => navigate("/brandEditor")}>New Brand</MenuItem>
+        <MenuItem onClick={() => navigate(ROUTES.BRAND_LIST)}>
+          All Brands
+        </MenuItem>
+        <MenuItem onClick={() => navigate(ROUTES.BRAND_EDITOR)}>
+          New Brand
+        </MenuItem>
+        <MenuItem onClick={() => navigate(ROUTES.DASHBOARD)}>
+          Dashboard
+        </MenuItem>
+        <MenuItem onClick={() => navigate(ROUTES.MEDIA_LIBRARY)}>
+          Media Library
+        </MenuItem>
       </Menu>
     </Box>
   );

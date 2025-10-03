@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import Logo from "../assets/NZ4WD-logo.gif";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../constants/routes";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const Header = () => {
       <Box
         component="img"
         src={Logo}
-        onClick={() => navigate("/")}
+        onClick={() => navigate(ROUTES.HOME)}
         sx={{ cursor: "pointer" }}
       />
     </Box>
