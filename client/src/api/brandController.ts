@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "../constants/backendURL";
 import type { BrandDetails, BrandList, GenericOut } from "../models";
-import { uploadImageSrcToS3 } from "../utils/apiUtil";
+import { uploadImageSrcToS3 } from "../services/s3Service";
 
 export const createBrand = async (
   brand: BrandDetails,

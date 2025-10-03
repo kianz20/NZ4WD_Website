@@ -53,7 +53,7 @@ async function downloadImage(url: string, filename: string) {
 
 async function downloadImageFromS3(key: string, filename: string) {
   const res = await fetch(
-    `${BACKEND_URL}/api/s3-presign/download?key=${encodeURIComponent(key)}`
+    `${BACKEND_URL}/api/s3/download?key=${encodeURIComponent(key)}`
   );
   if (!res.ok) throw new Error("Failed to get presigned URL");
   const { url } = await res.json();

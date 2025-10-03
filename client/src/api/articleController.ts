@@ -9,7 +9,7 @@ import type { ArticleType } from "../pages/ArticleEditor";
 import {
   replaceContentImagesWithS3,
   uploadImageSrcToS3,
-} from "../utils/apiUtil";
+} from "../services/s3Service";
 
 const prepareArticleForUpload = async (
   article: ArticleCreateIn

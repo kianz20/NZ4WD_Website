@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use("/api/articles", articleRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/s3-presign", s3Routes);
+app.use("/api/s3", s3Routes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/categories", categoryRoutes);
 
