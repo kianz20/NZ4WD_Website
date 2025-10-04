@@ -1,12 +1,9 @@
 import { Box, Button, Slider, Typography } from "@mui/material";
 import { useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
-import {
-  downloadImageFromS3,
-  getCroppedImg,
-  getFileExtensionFromKey,
-} from "../utils/pageUtils";
+import { getCroppedImg, getFileExtensionFromKey } from "../utils/pageUtils";
 import { s3prefix } from "../constants/s3Prefix";
+import { downloadImageFromS3 } from "../services/s3Service";
 
 interface ImageUploadProps {
   setOutput: (value: string | null) => void;

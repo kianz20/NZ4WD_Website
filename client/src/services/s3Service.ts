@@ -145,10 +145,30 @@ async function getAllMedia(continuationToken?: string): Promise<{
   };
 }
 
+async function downloadImageFromS3(key: string, filename: string) {
+  const res = await fetch(
+    `${BACKEND_URL}/api/s3/download?key=${encodeURIComponent(key)}`
+  );
+  if (!res.ok) throw new Error("Failed to get presigned URL");
+  const { url } = await res.json();
+
+  const fileRes = await fetch(url);
+  const blob = await fileRes.blob();
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
 export {
   base64ToFile,
   uploadFileToS3,
   replaceContentImagesWithS3,
   uploadImageSrcToS3,
   getAllMedia,
+  downloadImageFromS3,
 };

@@ -7,6 +7,9 @@ import {
   Box,
 } from "@mui/material";
 import styles from "../../styles/GalleryPhoto.module.css";
+import { getFileExtensionFromKey } from "../../utils/pageUtils";
+import { downloadImageFromS3 } from "../../services/s3Service";
+import { s3prefix } from "../../constants/s3Prefix";
 
 interface ViewPhotoDialogProps {
   open: boolean;
@@ -24,10 +27,32 @@ export const ViewPhotoDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      slotProps={{
+        paper: {
+          sx: { width: "85vw", maxWidth: "none" },
+        },
+      }}
+    >
       <DialogTitle>View Media</DialogTitle>
       <DialogContent sx={{ mt: 1 }}>
         <Box component="img" src={fileUrl} className={styles.focusedImage} />
+        <Button
+          onClick={() => {
+            if (fileUrl) {
+              const urlWithoutQuery = fileUrl.split("?")[0];
+              const extension = getFileExtensionFromKey(urlWithoutQuery);
+              downloadImageFromS3(
+                urlWithoutQuery.replace(s3prefix, ""),
+                `GalleryDownload.${extension}`
+              );
+            }
+          }}
+        >
+          Download
+        </Button>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Close</Button>

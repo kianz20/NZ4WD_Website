@@ -76,7 +76,7 @@ router.get("/all", async (req, res) => {
             Bucket: bucket,
             Key: obj.Key!,
           }),
-          { expiresIn: 60 }
+          { expiresIn: 900 }
         );
         return { key: obj.Key!, url };
       })
