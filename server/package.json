@@ -16,6 +16,7 @@
     "@aws-sdk/client-s3": "^3.884.0",
     "@aws-sdk/credential-providers": "^3.883.0",
     "@aws-sdk/s3-request-presigner": "^3.884.0",
+    "@google-analytics/data": "^5.2.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",

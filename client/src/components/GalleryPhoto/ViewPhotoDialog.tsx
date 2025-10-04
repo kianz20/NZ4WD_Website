@@ -9,7 +9,7 @@ import {
 import styles from "../../styles/GalleryPhoto.module.css";
 import { getFileExtensionFromKey } from "../../utils/pageUtils";
 import { downloadImageFromS3 } from "../../services/s3Service";
-import { s3prefix } from "../../constants/s3Prefix";
+import { S3PREFIX } from "../../constants/s3Prefix";
 
 interface ViewPhotoDialogProps {
   open: boolean;
@@ -45,7 +45,7 @@ export const ViewPhotoDialog = ({
               const urlWithoutQuery = fileUrl.split("?")[0];
               const extension = getFileExtensionFromKey(urlWithoutQuery);
               downloadImageFromS3(
-                urlWithoutQuery.replace(s3prefix, ""),
+                urlWithoutQuery.replace(S3PREFIX, ""),
                 `GalleryDownload.${extension}`
               );
             }

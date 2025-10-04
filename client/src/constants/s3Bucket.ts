@@ -1,2 +1,2 @@
-const s3Bucket = "nz4wd-images";
-export { s3Bucket };
+const S3BUCKET = "nz4wd-images";
+export { S3BUCKET };

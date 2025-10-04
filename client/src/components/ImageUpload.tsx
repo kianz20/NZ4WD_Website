@@ -2,7 +2,7 @@ import { Box, Button, Slider, Typography } from "@mui/material";
 import { useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { getCroppedImg, getFileExtensionFromKey } from "../utils/pageUtils";
-import { s3prefix } from "../constants/s3Prefix";
+import { S3PREFIX } from "../constants/s3Prefix";
 import { downloadImageFromS3 } from "../services/s3Service";
 
 interface ImageUploadProps {
@@ -50,7 +50,7 @@ const ImageUpload = (props: ImageUploadProps) => {
               if (existingFile) {
                 const extension = getFileExtensionFromKey(existingFile);
                 downloadImageFromS3(
-                  existingFile.replace(s3prefix, ""),
+                  existingFile.replace(S3PREFIX, ""),
                   `${downloadFileName}.${extension}`
                 );
               }

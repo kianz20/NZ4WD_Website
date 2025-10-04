@@ -91,14 +91,15 @@ const Dashboard = () => {
   const memoizedCards = useMemo(() => {
     return DASHBOARD_CARDS.filter((card) => visibleCards.includes(card.id)).map(
       (card) => {
-        const CardContent = card.content; // 👈 Assign to a PascalCase variable
+        const CardContent = card.content;
         return (
           <div key={card.id}>
             <InfoCard title={card.title}>
-              <CardContent /> {/* 👈 Render the component here */}
+              <CardContent />
               <Button
                 onClick={() => handleRemoveCard(card.id)}
                 onMouseDown={(e) => e.stopPropagation()}
+                sx={{ display: "block" }}
               >
                 Remove From Dash
               </Button>

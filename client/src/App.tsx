@@ -1,6 +1,7 @@
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Routes, Route } from "react-router-dom";
+import ReactGA from "react-ga4";
 
 import {
   Home,
@@ -19,8 +20,13 @@ import {
   MediaLibrary,
 } from "./pages";
 import { ROUTES } from "./constants/routes";
+import { GOOGLE_ANALYTICS_MEASUREMENT_ID } from "./constants/googleAnalyticsMeasurementID";
+import { usePageTracking } from "./hooks";
+
+ReactGA.initialize([{ trackingId: GOOGLE_ANALYTICS_MEASUREMENT_ID }]);
 
 const App = () => {
+  usePageTracking();
   return (
     <>
       <Routes>

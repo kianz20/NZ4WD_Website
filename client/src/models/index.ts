@@ -10,3 +10,4 @@ export type { BrandList } from "./BrandList";
 export type { Category } from "./Category";
 export type { CategoryList } from "./CategoryList";
 export { type ArticleState, ArticleStateOptions } from "./ArticleState";
+export type { AnalyticsResponse } from "./AnalyticsResponse";
