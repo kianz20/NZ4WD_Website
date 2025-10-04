@@ -111,7 +111,6 @@ router.get("/", async (req, res) => {
     }
 
     const articlesAll = await Article.find(filter).select("-content");
-    console.log(articlesAll);
     res.status(200).json(articlesAll);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch articles: " + error });

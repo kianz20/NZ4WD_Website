@@ -95,15 +95,13 @@ const Dashboard = () => {
         return (
           <div key={card.id}>
             <InfoCard title={card.title}>
-              <>
-                <CardContent /> {/* 👈 Render the component here */}
-                <Button
-                  onClick={() => handleRemoveCard(card.id)}
-                  onMouseDown={(e) => e.stopPropagation()}
-                >
-                  Remove From Dash
-                </Button>
-              </>
+              <CardContent /> {/* 👈 Render the component here */}
+              <Button
+                onClick={() => handleRemoveCard(card.id)}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                Remove From Dash
+              </Button>
             </InfoCard>
           </div>
         );
@@ -122,7 +120,7 @@ const Dashboard = () => {
         justifyContent="space-between"
         alignItems="center"
         mb={2}
-        px={3} // Adding some padding for better layout
+        px={3}
       >
         <Typography variant="h4" component="h1">
           Dashboard
