@@ -10,3 +10,4 @@ export { default as SearchBar } from "./SearchBar";
 export { default as ImageUpload } from "./ImageUpload";
 export { default as CategoriesMultiselect } from "./CategorySelector/CategoriesMultiselect";
 export { default as GalleryPhoto } from "./GalleryPhoto/GalleryPhoto";
+export { default as InfoCard } from "./InfoCard";
