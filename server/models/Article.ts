@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 interface Category {
   category: string;
-  parentCategory: string;
+  parentCategory?: string;
 }
 
 interface Article extends Document {
@@ -30,7 +30,7 @@ const ArticleSchema: Schema<Article> = new Schema(
       type: [
         {
           category: { type: String, required: true },
-          parentCategory: { type: String, required: true },
+          parentCategory: { type: String },
         },
       ],
       default: [],
