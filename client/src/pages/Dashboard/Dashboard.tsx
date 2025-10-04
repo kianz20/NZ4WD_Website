@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Typography, Button, Menu, MenuItem, Box } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import GridLayout, { type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+
 import { Header, Navbar, HeadlineBanner, InfoCard } from "../../components";
 import { useRequireAuth } from "../../hooks";
 import { DASHBOARD_CARDS } from "./DashboardCards";
@@ -13,6 +14,7 @@ const Dashboard = () => {
 
   const [visibleCards, setVisibleCards] = useState<string[]>(() => {
     const savedVisible = localStorage.getItem("dashboardVisibleCards");
+
     return savedVisible
       ? JSON.parse(savedVisible)
       : DASHBOARD_CARDS.map((c) => c.id);
@@ -20,9 +22,11 @@ const Dashboard = () => {
 
   const [layout, setLayout] = useState<Layout[]>(() => {
     const savedLayout = localStorage.getItem("dashboardLayout");
+
     const initialLayouts = savedLayout
       ? JSON.parse(savedLayout)
       : DASHBOARD_CARDS.map((c) => c.defaultLayout);
+
     return initialLayouts.filter((l: { i: string }) =>
       visibleCards.includes(l.i)
     );
@@ -35,39 +39,28 @@ const Dashboard = () => {
     (card) => !visibleCards.includes(card.id)
   );
 
-  const handleLayoutChange = (newLayout: Layout[]) => {
-    setLayout(newLayout);
+  const handleLayoutChange = useCallback((newLayout: Layout[]) => {
     localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
-  };
-
-  const handleRemoveCard = (cardIdToRemove: string) => {
-    console.log(cardIdToRemove);
-    const newVisibleCards = visibleCards.filter((id) => id !== cardIdToRemove);
-    setVisibleCards(newVisibleCards);
-    localStorage.setItem(
-      "dashboardVisibleCards",
-      JSON.stringify(newVisibleCards)
-    );
-
-    const newLayout = layout.filter((l) => l.i !== cardIdToRemove);
     setLayout(newLayout);
-    localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
-  };
+  }, []); // No dependencies, as setLayout is stable
 
-  const handleAddCard = (cardToAdd: (typeof DASHBOARD_CARDS)[0]) => {
-    const newVisibleCards = [...visibleCards, cardToAdd.id];
-    setVisibleCards(newVisibleCards);
-    localStorage.setItem(
-      "dashboardVisibleCards",
-      JSON.stringify(newVisibleCards)
-    );
+  const handleRemoveCard = useCallback(
+    (cardIdToRemove: string) => {
+      const newVisibleCards = visibleCards.filter(
+        (id) => id !== cardIdToRemove
+      );
+      setVisibleCards(newVisibleCards);
+      localStorage.setItem(
+        "dashboardVisibleCards",
+        JSON.stringify(newVisibleCards)
+      );
 
-    const newLayout = [...layout, cardToAdd.defaultLayout];
-    setLayout(newLayout);
-    localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
-
-    handleMenuClose();
-  };
+      const newLayout = layout.filter((l) => l.i !== cardIdToRemove);
+      setLayout(newLayout);
+      localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
+    },
+    [visibleCards, layout]
+  );
 
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -76,6 +69,47 @@ const Dashboard = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handleAddCard = useCallback(
+    (cardToAdd: (typeof DASHBOARD_CARDS)[0]) => {
+      const newVisibleCards = [...visibleCards, cardToAdd.id];
+      setVisibleCards(newVisibleCards);
+      localStorage.setItem(
+        "dashboardVisibleCards",
+        JSON.stringify(newVisibleCards)
+      );
+
+      const newLayout = [...layout, cardToAdd.defaultLayout];
+      setLayout(newLayout);
+      localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
+
+      handleMenuClose();
+    },
+    [visibleCards, layout]
+  );
+
+  const memoizedCards = useMemo(() => {
+    return DASHBOARD_CARDS.filter((card) => visibleCards.includes(card.id)).map(
+      (card) => {
+        const CardContent = card.content; // 👈 Assign to a PascalCase variable
+        return (
+          <div key={card.id}>
+            <InfoCard title={card.title}>
+              <>
+                <CardContent /> {/* 👈 Render the component here */}
+                <Button
+                  onClick={() => handleRemoveCard(card.id)}
+                  onMouseDown={(e) => e.stopPropagation()}
+                >
+                  Remove From Dash
+                </Button>
+              </>
+            </InfoCard>
+          </div>
+        );
+      }
+    );
+  }, [visibleCards, handleRemoveCard]);
 
   return (
     <>
@@ -88,6 +122,7 @@ const Dashboard = () => {
         justifyContent="space-between"
         alignItems="center"
         mb={2}
+        px={3} // Adding some padding for better layout
       >
         <Typography variant="h4" component="h1">
           Dashboard
@@ -114,27 +149,10 @@ const Dashboard = () => {
         layout={layout}
         cols={12}
         rowHeight={150}
-        width={2000}
+        width={2000} // Consider making this dynamic, e.g., based on screen width
         onLayoutChange={handleLayoutChange}
       >
-        {DASHBOARD_CARDS.filter((card) => visibleCards.includes(card.id)).map(
-          (card) => (
-            <div key={card.id}>
-              {/* Assuming InfoCard can take a custom action component */}
-              <InfoCard title={card.title}>
-                <>
-                  {card.content}
-                  <Button
-                    onClick={() => handleRemoveCard(card.id)}
-                    onMouseDown={(e) => e.stopPropagation()}
-                  >
-                    Remove From Dash
-                  </Button>
-                </>
-              </InfoCard>
-            </div>
-          )
-        )}
+        {memoizedCards}
       </GridLayout>
     </>
   );

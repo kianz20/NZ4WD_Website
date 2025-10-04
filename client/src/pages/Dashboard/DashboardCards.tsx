@@ -1,11 +1,13 @@
 import type { Layout } from "react-grid-layout";
 import ScheduledArticlesCard from "./ScheduledArticlesCard";
+import AnalyticsCard from "./AnalyticsCard";
+import QuickActionsCard from "./QuickActionsCard";
 
 interface DashboardCard {
   id: string;
   title: string;
   defaultLayout: Layout;
-  content: React.ReactNode;
+  content: React.FC;
 }
 
 export const DASHBOARD_CARDS: DashboardCard[] = [
@@ -13,18 +15,18 @@ export const DASHBOARD_CARDS: DashboardCard[] = [
     id: "scheduled",
     title: "Scheduled Articles",
     defaultLayout: { i: "scheduled", x: 0, y: 0, w: 4, h: 2 },
-    content: <ScheduledArticlesCard />,
+    content: ScheduledArticlesCard,
   },
   {
     id: "analytics",
     title: "Analytics",
     defaultLayout: { i: "analytics", x: 4, y: 0, w: 4, h: 2 },
-    content: <></>,
+    content: AnalyticsCard,
   },
   {
     id: "quickActions",
     title: "Quick Actions",
     defaultLayout: { i: "quickActions", x: 8, y: 0, w: 4, h: 2 },
-    content: <></>,
+    content: QuickActionsCard,
   },
 ];
