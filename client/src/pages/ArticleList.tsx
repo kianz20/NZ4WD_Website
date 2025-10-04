@@ -6,6 +6,7 @@ import { useRequireAuth, useToast } from "../hooks";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../constants/routes";
+import { ArticleStateOptions } from "../models";
 
 interface ArticleGridRows {
   id: string;
@@ -17,10 +18,10 @@ interface ArticleGridRows {
   state: string;
 }
 
+const draftState = "Draft ✏️";
 const publishedState = "Published ✅";
 const archivedState = "Archived 📦";
 const scheduledState = "Scheduled 🕒";
-const draftState = "Draft ✏️";
 
 const getArticleState = (
   article: {
@@ -134,7 +135,7 @@ const ArticleList = () => {
       if (userToken) {
         setLoading(true);
         try {
-          const response = await api.getArticles(false);
+          const response = await api.getArticles(ArticleStateOptions.All);
           const now = new Date();
           setRows(
             response.map((article) => ({

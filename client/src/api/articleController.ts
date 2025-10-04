@@ -72,12 +72,13 @@ export const updateArticle = async (
 };
 
 export const getArticles = async (
-  activeOnly?: boolean,
+  articleState: string,
   articleType?: ArticleType
 ): Promise<ArticleList> => {
   const url = new URL(`${BACKEND_URL}/api/articles/`);
   if (articleType) url.searchParams.append("articleType", articleType);
-  if (activeOnly) url.searchParams.append("activeOnly", activeOnly.toString());
+  if (articleState)
+    url.searchParams.append("articleState", articleState.toString());
 
   const response = await fetch(url.toString(), {
     method: "GET",

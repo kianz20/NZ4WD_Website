@@ -85,14 +85,29 @@ router.put("/:id", authenticateToken, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const { articleType, activeOnly } = req.query;
+    const { articleType, articleState } = req.query;
     const filter: any = {};
+    const currentDate = new Date();
 
     if (articleType) filter.articleType = articleType;
 
-    if (activeOnly === "true") {
-      filter.readyToPublish = true;
-      filter.publishDate = { $lte: new Date() };
+    if (articleState) {
+      switch (articleState) {
+        case "draft":
+          filter.readyToPublish = false;
+          break;
+        case "published":
+          filter.readyToPublish = true;
+          filter.publishDate = { $lte: currentDate };
+          break;
+        case "archived":
+          filter.archived = true;
+          break;
+        case "scheduled":
+          filter.readyToPublish = true;
+          filter.publishDate = { $gt: currentDate };
+          break;
+      }
     }
 
     const articles = await Article.find(filter).select("-content");

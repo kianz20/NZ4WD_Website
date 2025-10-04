@@ -2,7 +2,7 @@ import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
 import { useEffect, useState } from "react";
 import { useToast } from "../hooks";
 import * as api from "../api/articleController";
-import { type ArticleList } from "../models";
+import { ArticleStateOptions, type ArticleList } from "../models";
 import { ArticleGrid } from "../components";
 import PageTitle from "../components/PageTitle";
 import type { ArticleType } from "./ArticleEditor";
@@ -24,7 +24,10 @@ const Articles = (props: ArticleProps) => {
     const getArticles = async () => {
       setLoading(true);
       try {
-        const response = await api.getArticles(true, articleFilter);
+        const response = await api.getArticles(
+          ArticleStateOptions.Published,
+          articleFilter
+        );
         setArticles(response);
       } catch {
         showToast("failed to get articles", "error");

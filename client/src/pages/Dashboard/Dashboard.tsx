@@ -4,50 +4,25 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import GridLayout, { type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Header, Navbar, HeadlineBanner, InfoCard } from "../components";
-import { useRequireAuth } from "../hooks";
-
-interface DashboardCard {
-  id: string;
-  title: string;
-  defaultLayout: Layout;
-  content: React.ReactNode;
-}
-
-const ALL_CARDS: DashboardCard[] = [
-  {
-    id: "scheduled",
-    title: "Scheduled Articles",
-    defaultLayout: { i: "scheduled", x: 0, y: 0, w: 4, h: 2 },
-    content: <></>,
-  },
-  {
-    id: "analytics",
-    title: "Analytics",
-    defaultLayout: { i: "analytics", x: 4, y: 0, w: 4, h: 2 },
-    content: <></>,
-  },
-  {
-    id: "quickActions",
-    title: "Quick Actions",
-    defaultLayout: { i: "quickActions", x: 8, y: 0, w: 4, h: 2 },
-    content: <></>,
-  },
-];
+import { Header, Navbar, HeadlineBanner, InfoCard } from "../../components";
+import { useRequireAuth } from "../../hooks";
+import { DASHBOARD_CARDS } from "./DashboardCards";
 
 const Dashboard = () => {
   useRequireAuth();
 
   const [visibleCards, setVisibleCards] = useState<string[]>(() => {
     const savedVisible = localStorage.getItem("dashboardVisibleCards");
-    return savedVisible ? JSON.parse(savedVisible) : ALL_CARDS.map((c) => c.id);
+    return savedVisible
+      ? JSON.parse(savedVisible)
+      : DASHBOARD_CARDS.map((c) => c.id);
   });
 
   const [layout, setLayout] = useState<Layout[]>(() => {
     const savedLayout = localStorage.getItem("dashboardLayout");
     const initialLayouts = savedLayout
       ? JSON.parse(savedLayout)
-      : ALL_CARDS.map((c) => c.defaultLayout);
+      : DASHBOARD_CARDS.map((c) => c.defaultLayout);
     return initialLayouts.filter((l: { i: string }) =>
       visibleCards.includes(l.i)
     );
@@ -56,7 +31,7 @@ const Dashboard = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
 
-  const hiddenCards = ALL_CARDS.filter(
+  const hiddenCards = DASHBOARD_CARDS.filter(
     (card) => !visibleCards.includes(card.id)
   );
 
@@ -79,7 +54,7 @@ const Dashboard = () => {
     localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
   };
 
-  const handleAddCard = (cardToAdd: (typeof ALL_CARDS)[0]) => {
+  const handleAddCard = (cardToAdd: (typeof DASHBOARD_CARDS)[0]) => {
     const newVisibleCards = [...visibleCards, cardToAdd.id];
     setVisibleCards(newVisibleCards);
     localStorage.setItem(
@@ -142,7 +117,7 @@ const Dashboard = () => {
         width={2000}
         onLayoutChange={handleLayoutChange}
       >
-        {ALL_CARDS.filter((card) => visibleCards.includes(card.id)).map(
+        {DASHBOARD_CARDS.filter((card) => visibleCards.includes(card.id)).map(
           (card) => (
             <div key={card.id}>
               {/* Assuming InfoCard can take a custom action component */}
