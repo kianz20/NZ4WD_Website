@@ -1,13 +1,11 @@
-// server/routes/analytics.js
 import express from "express";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
 const router = express.Router();
 const propertyID = process.env.GOOGLE_ANALYTICS_PROPERTY_ID || "507495832";
 
-// Initialize GA4 client
 const client = new BetaAnalyticsDataClient({
-  keyFile: "./nz4wd-website-6bf6f44990bf.json", // path to downloaded JSON
+  keyFile: "./nz4wd-website-6bf6f44990bf.json",
 });
 
 router.get("/pageviews", async (req, res) => {
