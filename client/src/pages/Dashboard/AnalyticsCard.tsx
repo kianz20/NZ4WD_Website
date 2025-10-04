@@ -3,8 +3,6 @@ import * as api from "../../api/analyticsController";
 import { useRequireAuth, useToast } from "../../hooks";
 import type { AnalyticsResponse } from "../../models";
 import {
-  Card,
-  CardContent,
   Typography,
   List,
   ListItem,
@@ -59,7 +57,7 @@ const AnalyticsCard = () => {
                   secondary={`Views: ${row.metricValues[0].value}`}
                 />
               </ListItem>
-              {i < data.rows.length - 1 && <Divider />}
+              {data.rows && i < data.rows.length - 1 && <Divider />}
             </Box>
           ))}
         </List>
