@@ -8,7 +8,7 @@ const client = new BetaAnalyticsDataClient({
   keyFile: "./nz4wd-website-6bf6f44990bf.json",
 });
 
-router.get("/pageviews", async (req, res) => {
+router.get("/metrics", async (req, res) => {
   try {
     const [response] = await client.runReport({
       property: `properties/${propertyID}`,

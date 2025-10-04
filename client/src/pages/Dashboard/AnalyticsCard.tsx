@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import * as api from "../../api/analyticsController";
 import { useRequireAuth, useToast } from "../../hooks";
 import type { AnalyticsResponse } from "../../models";
+import {
+  Card,
+  CardContent,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  CircularProgress,
+  Box,
+} from "@mui/material";
 
 const AnalyticsCard = () => {
   const [data, setData] = useState<AnalyticsResponse>();
@@ -15,27 +26,45 @@ const AnalyticsCard = () => {
           const response = await api.getAnalytics(userToken);
           setData(response);
         } catch {
-          showToast("failed to get brands", "error");
+          showToast("Failed to get analytics", "error");
         }
       }
     };
     getStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userToken]);
 
-  if (!data) return <>Loading...</>;
+  if (!data)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   return (
-    <div>
-      <h3>Pageviews (last 7 days)</h3>
-      <ul>
-        {data.rows?.map((row, i) => (
-          <li key={i}>
-            {row.dimensionValues[0].value}: {row.metricValues[0].value}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Typography variant="h6" gutterBottom>
+        Pageviews (last 7 days)
+      </Typography>
+      <Box sx={{ width: "100%", height: "90%", overflowY: "auto" }}>
+        <List disablePadding>
+          {data.rows?.map((row, i) => (
+            <Box key={i} sx={{ width: "100%", height: "100%" }}>
+              <ListItem>
+                <ListItemText
+                  primary={
+                    row.dimensionValues[0].value.replace("/", "") == ""
+                      ? "home"
+                      : row.dimensionValues[0].value.replace("/", "")
+                  }
+                  secondary={`Views: ${row.metricValues[0].value}`}
+                />
+              </ListItem>
+              {i < data.rows.length - 1 && <Divider />}
+            </Box>
+          ))}
+        </List>
+      </Box>
+    </>
   );
 };
 

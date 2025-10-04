@@ -4,7 +4,7 @@ import type { AnalyticsResponse } from "../models";
 export const getAnalytics = async (
   token: string
 ): Promise<AnalyticsResponse> => {
-  const response = await fetch(`${BACKEND_URL}/api/analytics/pageviews`, {
+  const response = await fetch(`${BACKEND_URL}/api/admin/metrics`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
