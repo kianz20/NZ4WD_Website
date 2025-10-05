@@ -307,7 +307,7 @@ const ArticleEditor = () => {
             />
           </Box>
 
-          <Button variant="outlined" type="submit">
+          <Button variant="outlined" type="submit" sx={{ marginRight: "10px" }}>
             Save
           </Button>
         </Box>
@@ -326,7 +326,7 @@ const ArticleEditor = () => {
               <CardContent>
                 <Typography>Short Description</Typography>
                 <TextField
-                  sx={{ width: 500 }}
+                  sx={{ width: 445 }}
                   name="shortDescription"
                   value={formValues.shortDescription || ""}
                   multiline
