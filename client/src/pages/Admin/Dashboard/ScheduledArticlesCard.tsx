@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { ArticleStateOptions } from "../../models";
-import { useRequireAuth, useToast } from "../../hooks";
-import * as api from "../../api/articleController";
+import { ArticleStateOptions } from "../../../models";
+import { useRequireAuth, useToast } from "../../../hooks";
+import * as api from "../../../api/articleController";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
-import { ConfirmDialog } from "../../components";
+import { ConfirmDialog } from "../../../components";
 import Typography from "@mui/material/Typography";
 
 interface ScheduledArticleGridRows {

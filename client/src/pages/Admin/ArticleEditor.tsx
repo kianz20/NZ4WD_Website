@@ -9,27 +9,26 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {
-  CategoriesMultiselect,
-  Header,
-  ImageUpload,
-  LoadingSpinner,
-  Navbar,
-} from "../components";
+import dayjs from "dayjs";
+import { ImageResize } from "quill-image-resize-module-ts";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { useEffect, useMemo, useRef, useState } from "react";
-import dayjs from "dayjs";
-import * as api from "../api/articleController";
-import { useRequireAuth, useToast } from "../hooks";
 import { useNavigate, useParams } from "react-router-dom";
-import type { ArticleDetails, Category } from "../models";
-import { ImageResize } from "quill-image-resize-module-ts";
-import { ROUTES } from "../constants/routes";
-import styles from "../styles/ArticleEditor.module.css";
+import * as api from "../../api/articleController";
+import {
+  AdminNavbar,
+  CategoriesMultiselect,
+  ImageUpload,
+  LoadingSpinner,
+} from "../../components";
+import { ADMIN_ROUTES } from "../../constants/routes";
+import { useRequireAuth, useToast } from "../../hooks";
+import type { ArticleDetails, Category } from "../../models";
+import styles from "../../styles/ArticleEditor.module.css";
 
 const articleTypeOptions = ["news", "article", "review", "brands"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
@@ -247,7 +246,7 @@ const ArticleEditor = () => {
           await api.createArticle(transformedData, userToken);
           showToast("Article Created", "success");
         }
-        navigate(ROUTES.ARTICLE_LIST);
+        navigate(ADMIN_ROUTES.ARTICLE_LIST);
       } catch {
         showToast("Save failed", "error");
       } finally {
@@ -259,8 +258,7 @@ const ArticleEditor = () => {
   return (
     <>
       <LoadingSpinner open={loading} />
-      <Header />
-      <Navbar />
+      <AdminNavbar />
       <form onSubmit={handleSave}>
         <Box display="flex" alignItems="center" width="100%" mt={2}>
           <Box

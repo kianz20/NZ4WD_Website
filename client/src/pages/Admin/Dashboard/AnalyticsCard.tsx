@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import * as api from "../../api/analyticsController";
-import { useRequireAuth, useToast } from "../../hooks";
-import type { AnalyticsResponse } from "../../models";
+import * as api from "../../../api/analyticsController";
+import { useRequireAuth, useToast } from "../../../hooks";
+import type { AnalyticsResponse } from "../../../models";
 import {
   Typography,
   List,

@@ -27,6 +27,7 @@ const LoginDialog = ({ open, onClose }: LoginDialogProps) => {
     const { name, value } = event.target;
     setLoginBody((prevState) => ({ ...prevState, [name]: value }));
   };
+
   const handleLogin = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     try {

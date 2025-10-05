@@ -1,5 +1,5 @@
 import type { Category } from ".";
-import type { ArticleType } from "../pages/ArticleEditor";
+import type { ArticleType } from "../pages/Admin/ArticleEditor";
 
 export interface ArticleDetails {
   author: string;

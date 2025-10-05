@@ -1,17 +1,16 @@
 import { Button, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import * as api from "../../api/brandController";
 import {
-  Header,
+  AdminNavbar,
   HeadlineBanner,
   ImageUpload,
   LoadingSpinner,
-  Navbar,
-} from "../components";
-import { useEffect, useState } from "react";
-import type { BrandDetails } from "../models";
-import { useRequireAuth, useToast } from "../hooks";
-import * as api from "../api/brandController";
-import { useNavigate, useParams } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
+} from "../../components";
+import { ADMIN_ROUTES } from "../../constants/routes";
+import { useRequireAuth, useToast } from "../../hooks";
+import type { BrandDetails } from "../../models";
 
 const BrandEditor = () => {
   const { userToken } = useRequireAuth();
@@ -74,7 +73,7 @@ const BrandEditor = () => {
         } else {
           await api.createBrand(transformedData, userToken);
         }
-        navigate(ROUTES.BRAND_LIST);
+        navigate(ADMIN_ROUTES.BRAND_LIST);
       } catch {
         showToast("Save failed", "error");
       } finally {
@@ -86,8 +85,7 @@ const BrandEditor = () => {
   return (
     <>
       <LoadingSpinner open={loading} />
-      <Header />
-      <Navbar />
+      <AdminNavbar />
       <HeadlineBanner />
       <Typography variant="h4" component="h1">
         New Brand
@@ -105,7 +103,6 @@ const BrandEditor = () => {
             if (value) handleChange("logo", value);
           }}
           downloadFileName={`${formValues.name}-logo`}
-          headingText="Brand Logo"
           existingFile={formValues.logo}
         />
 

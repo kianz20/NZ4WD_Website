@@ -1,12 +1,12 @@
-import { useState, useMemo, useCallback } from "react";
-import { Typography, Button, Menu, MenuItem, Box } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
+import { useCallback, useMemo, useState } from "react";
 import GridLayout, { type Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
-import { Header, Navbar, HeadlineBanner, InfoCard } from "../../components";
-import { useRequireAuth } from "../../hooks";
+import { AdminNavbar, InfoCard } from "../../../components";
+import { useRequireAuth } from "../../../hooks";
 import { DASHBOARD_CARDS } from "./DashboardCards";
 
 const Dashboard = () => {
@@ -112,9 +112,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <Header />
-      <Navbar />
-      <HeadlineBanner />
+      <AdminNavbar />
 
       <Box
         display="flex"

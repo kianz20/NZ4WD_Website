@@ -1,10 +1,7 @@
-// SearchBar.tsx
 import { Autocomplete, createFilterOptions, TextField } from "@mui/material";
-// ADDED: Import useRef
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as api from "../api/articleController";
-import { useRequireAuth } from "../hooks";
 import styles from "../styles/SearchBar.module.css";
 import SearchResult from "./SearchResult";
 import { ROUTES } from "../constants/routes";
@@ -18,7 +15,6 @@ export interface Article {
 }
 
 const SearchBar = () => {
-  const { userToken } = useRequireAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [articleList, setArticleList] = useState<Article[]>([]);
@@ -26,18 +22,15 @@ const SearchBar = () => {
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<Article | null>(null);
-  // ADDED: A ref to access the input DOM element.
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (userToken) {
-      setLoading(true);
-      api
-        .getArticles(true)
-        .then((data) => setArticleList(data))
-        .finally(() => setLoading(false));
-    }
-  }, [userToken]);
+    setLoading(true);
+    api
+      .getArticles("published")
+      .then((data) => setArticleList(data))
+      .finally(() => setLoading(false));
+  }, []);
 
   // MODIFIED: This effect now also removes focus from the text field.
   useEffect(() => {

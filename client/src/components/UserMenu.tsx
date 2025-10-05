@@ -1,7 +1,7 @@
 import { Box, Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
+import { ADMIN_ROUTES } from "../constants/routes";
 
 const UserMenu = ({ username }: { username: string }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -22,22 +22,22 @@ const UserMenu = ({ username }: { username: string }) => {
         {username}
       </Box>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={() => navigate(ROUTES.ARTICLE_LIST)}>
+        <MenuItem onClick={() => navigate(ADMIN_ROUTES.ARTICLE_LIST)}>
           All Articles
         </MenuItem>
-        <MenuItem onClick={() => navigate(ROUTES.ARTICLE_EDITOR)}>
+        <MenuItem onClick={() => navigate(ADMIN_ROUTES.ARTICLE_EDITOR)}>
           New Article
         </MenuItem>
-        <MenuItem onClick={() => navigate(ROUTES.BRAND_LIST)}>
+        <MenuItem onClick={() => navigate(ADMIN_ROUTES.BRAND_LIST)}>
           All Brands
         </MenuItem>
-        <MenuItem onClick={() => navigate(ROUTES.BRAND_EDITOR)}>
+        <MenuItem onClick={() => navigate(ADMIN_ROUTES.BRAND_EDITOR)}>
           New Brand
         </MenuItem>
-        <MenuItem onClick={() => navigate(ROUTES.DASHBOARD)}>
+        <MenuItem onClick={() => navigate(ADMIN_ROUTES.DASHBOARD)}>
           Dashboard
         </MenuItem>
-        <MenuItem onClick={() => navigate(ROUTES.MEDIA_LIBRARY)}>
+        <MenuItem onClick={() => navigate(ADMIN_ROUTES.MEDIA_LIBRARY)}>
           Media Library
         </MenuItem>
       </Menu>

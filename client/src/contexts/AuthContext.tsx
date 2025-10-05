@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import type { LoginResponse } from "../models";
+import { useNavigate } from "react-router-dom";
+import { ADMIN_ROUTES } from "../constants/routes";
 
 export interface AuthData {
   isAuthenticated: boolean;
@@ -20,6 +22,7 @@ const AuthContext = createContext<AuthData | undefined>(undefined);
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const navigate = useNavigate();
   const [authData, setAuthData] = useState<
     Omit<AuthData, "logout" | "setUserCookies">
   >({
@@ -45,6 +48,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       username: undefined,
       authorName: undefined,
     });
+    navigate(ADMIN_ROUTES.LOGIN);
   }, []);
 
   useEffect(() => {

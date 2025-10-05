@@ -1,11 +1,16 @@
-import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
+import {
+  Header,
+  HeadlineBanner,
+  LoadingSpinner,
+  Navbar,
+} from "../../components";
 import { useEffect, useState } from "react";
-import { useToast } from "../hooks";
-import * as api from "../api/articleController";
-import { ArticleStateOptions, type ArticleList } from "../models";
-import { ArticleGrid } from "../components";
-import PageTitle from "../components/PageTitle";
-import type { ArticleType } from "./ArticleEditor";
+import { useToast } from "../../hooks";
+import * as api from "../../api/articleController";
+import { ArticleStateOptions, type ArticleList } from "../../models";
+import { ArticleGrid } from "../../components";
+import PageTitle from "../../components/PageTitle";
+import type { ArticleType } from "../Admin/ArticleEditor";
 
 interface ArticleProps {
   pageTitle: string;

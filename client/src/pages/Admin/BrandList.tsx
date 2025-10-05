@@ -1,11 +1,11 @@
 import { Box, Button, Typography } from "@mui/material";
-import { ConfirmDialog, Header, LoadingSpinner, Navbar } from "../components";
-import { useEffect, useState } from "react";
-import * as api from "../api/brandController";
-import { useRequireAuth, useToast } from "../hooks";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
+import * as api from "../../api/brandController";
+import { AdminNavbar, ConfirmDialog, LoadingSpinner } from "../../components";
+import { useRequireAuth, useToast } from "../../hooks";
+import { ADMIN_ROUTES } from "../../constants/routes";
 
 interface BrandGridRows {
   id: string;
@@ -71,7 +71,7 @@ const BrandList = () => {
   }, [userToken]);
 
   const handleEdit = (id: string) => {
-    navigate(ROUTES.BRAND_EDITOR.replace(":id", id));
+    navigate(ADMIN_ROUTES.BRAND_EDITOR.replace(":id", id));
   };
 
   const columns: GridColDef<BrandGridRows>[] = [
@@ -107,8 +107,7 @@ const BrandList = () => {
   return (
     <>
       <LoadingSpinner open={loading} />
-      <Header />
-      <Navbar />
+      <AdminNavbar />
       <Typography variant="h4" component="h1">
         Brands
       </Typography>

@@ -1,12 +1,17 @@
 import { Box, Button, Typography } from "@mui/material";
-import { Header, HeadlineBanner, LoadingSpinner, Navbar } from "../components";
+import {
+  Header,
+  HeadlineBanner,
+  LoadingSpinner,
+  Navbar,
+} from "../../components";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import * as api from "../api/articleController";
-import { type ArticleDetails } from "../models";
+import * as api from "../../api/articleController";
+import { type ArticleDetails } from "../../models";
 import DOMPurify from "dompurify";
-import styles from "../styles/Article.module.css";
-import PageTitle from "../components/PageTitle";
+import styles from "../../styles/Article.module.css";
+import PageTitle from "../../components/PageTitle";
 
 const Article = () => {
   const { id } = useParams<{ id: string }>();

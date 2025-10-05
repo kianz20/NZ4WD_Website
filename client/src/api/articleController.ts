@@ -5,7 +5,7 @@ import type {
   ArticleList,
   GenericOut,
 } from "../models";
-import type { ArticleType } from "../pages/ArticleEditor";
+import type { ArticleType } from "../pages/Admin/ArticleEditor";
 import {
   replaceContentImagesWithS3,
   uploadImageSrcToS3,

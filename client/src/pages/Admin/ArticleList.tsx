@@ -1,12 +1,12 @@
 import { Box, Button, Checkbox, Typography } from "@mui/material";
-import { ConfirmDialog, Header, LoadingSpinner, Navbar } from "../components";
-import { useEffect, useState } from "react";
-import * as api from "../api/articleController";
-import { useRequireAuth, useToast } from "../hooks";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
-import { ArticleStateOptions } from "../models";
+import * as api from "../../api/articleController";
+import { AdminNavbar, ConfirmDialog, LoadingSpinner } from "../../components";
+import { useRequireAuth, useToast } from "../../hooks";
+import { ArticleStateOptions } from "../../models";
+import { ADMIN_ROUTES } from "../../constants/routes";
 
 interface ArticleGridRows {
   id: string;
@@ -167,7 +167,7 @@ const ArticleList = () => {
   }, [userToken]);
 
   const handleEdit = (id: string) => {
-    navigate(ROUTES.ARTICLE_EDITOR_WITH_ID.replace(":id", id));
+    navigate(ADMIN_ROUTES.ARTICLE_EDITOR_WITH_ID.replace(":id", id));
   };
 
   // 2. CREATE a new function to process the "ready" toggle
@@ -309,8 +309,7 @@ const ArticleList = () => {
   return (
     <>
       <LoadingSpinner open={loading} />
-      <Header />
-      <Navbar />
+      <AdminNavbar />
       <Typography variant="h4" component="h1">
         Articles
       </Typography>

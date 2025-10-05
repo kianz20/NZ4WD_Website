@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
-import { Header, HeadlineBanner, Navbar } from "../components";
-import pfp from "../assets/profilePicture.png";
+import { Header, HeadlineBanner, Navbar } from "../../components";
+import pfp from "../../assets/profilePicture.png";
 
 const About = () => {
   return (

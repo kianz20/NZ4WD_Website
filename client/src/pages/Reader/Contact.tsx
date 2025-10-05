@@ -1,18 +1,17 @@
 import { Typography } from "@mui/material";
-import { Header, HeadlineBanner, Navbar, SearchBar } from "../components";
+import { Header, HeadlineBanner, Navbar } from "../../components";
 
-const Home = () => {
+const Contact = () => {
   return (
     <>
       <Header />
       <Navbar />
       <HeadlineBanner />
       <Typography variant="h4" component="h1">
-        Home
+        Contact Us
       </Typography>
-      <SearchBar />
     </>
   );
 };
 
-export default Home;
+export default Contact;

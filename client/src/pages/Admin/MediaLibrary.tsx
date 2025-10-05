@@ -1,8 +1,8 @@
 import { Typography } from "@mui/material";
-import { GalleryPhoto, Header, HeadlineBanner, Navbar } from "../components";
-import { useRequireAuth } from "../hooks";
 import { useEffect, useState } from "react";
-import { getAllMedia } from "../services/s3Service";
+import { AdminNavbar, GalleryPhoto } from "../../components";
+import { useRequireAuth } from "../../hooks";
+import { getAllMedia } from "../../services/s3Service";
 
 const MediaLibrary = () => {
   const [files, setFiles] = useState<{ key: string; url: string }[]>([]);
@@ -22,9 +22,7 @@ const MediaLibrary = () => {
 
   return (
     <>
-      <Header />
-      <Navbar />
-      <HeadlineBanner />
+      <AdminNavbar />
       <Typography variant="h4" component="h1">
         Media Library
       </Typography>
