@@ -118,18 +118,18 @@ const ImageUpload = (props: ImageUploadProps) => {
             onChange={handleFileChange}
           />
         </Button>
-        {preview ||
-          (isLoaded && (
-            <Button
-              onClick={() => {
-                removeImage();
-              }}
-              variant="outlined"
-              color="error"
-            >
-              Remove
-            </Button>
-          ))}
+
+        {(preview || isLoaded) && (
+          <Button
+            onClick={() => {
+              removeImage();
+            }}
+            variant="outlined"
+            color="error"
+          >
+            Remove
+          </Button>
+        )}
 
         {isLoaded && (
           <>
