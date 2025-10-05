@@ -5,6 +5,7 @@
 }
 
 .thumbnailCard {
+  margin-top: 15px;
   margin-left: 15px;
   width: 475px;
   height: 466px;
@@ -12,6 +13,17 @@
 
 .categoriesCard {
   margin-top: 15px;
+  margin-left: 15px;
+  width: 475px;
+}
+
+.publishCard {
+  margin-top: 15px;
+  margin-left: 15px;
+  width: 475px;
+}
+
+.descriptionCard {
   margin-left: 15px;
   width: 475px;
 }

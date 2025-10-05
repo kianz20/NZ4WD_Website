@@ -261,83 +261,57 @@ const ArticleEditor = () => {
       <LoadingSpinner open={loading} />
       <Header />
       <Navbar />
-      <Typography variant="h4" component="h1">
-        {id ? "Edit Article" : "New Article"}
-      </Typography>
-      <br />
       <form onSubmit={handleSave}>
-        {/* All form fields remain the same */}
-        <TextField
-          label="Author"
-          name="author"
-          value={formValues.author}
-          onChange={(e) => handleChange("author", e.target.value)}
-          required
-        />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
-            label="Publish Date"
-            value={dayjs(formValues.publishDate)}
-            onChange={(newValue) =>
-              handleChange(
-                "publishDate",
-                newValue ? newValue.toDate() : new Date()
-              )
-            }
-          />
-        </LocalizationProvider>
-        <TextField
-          label="Title"
-          name="title"
-          value={formValues.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-          required
-        />
-        <br />
-        <br />
-
-        <br />
-        <Autocomplete
-          sx={{ width: 500 }}
-          options={articleTypeOptions}
-          renderInput={(params) => (
-            <TextField {...params} label="Article Type" />
-          )}
-          value={formValues.articleType}
-          onChange={(_, newValue) => {
-            if (
-              newValue &&
-              articleTypeOptions.includes(newValue as ArticleType)
-            ) {
-              handleChange("articleType", newValue as ArticleType);
-            } else {
-              handleChange("articleType", "article"); // fallback
-            }
-          }}
-        />
-        <br />
-        <TextField
-          sx={{ width: 500 }}
-          label="Short Description"
-          name="shortDescription"
-          value={formValues.shortDescription || ""}
-          multiline
-          rows={2}
-          onChange={(e) => handleChange("shortDescription", e.target.value)}
-        />
-        <br />
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="readyToPublish"
-              checked={formValues.readyToPublish}
-              onChange={(e) => handleChange("readyToPublish", e.target.checked)}
+        <Box display="flex" alignItems="center" width="100%" mt={2}>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            gap={1}
+            flexGrow={1} // take up remaining space to allow centering
+          >
+            <TextField
+              label="Author"
+              name="author"
+              value={formValues.author}
+              onChange={(e) => handleChange("author", e.target.value)}
+              required
             />
-          }
-          label="Ready to Publish"
-        />
 
-        <br />
+            <TextField
+              label="Title"
+              name="title"
+              value={formValues.title}
+              onChange={(e) => handleChange("title", e.target.value)}
+              required
+              sx={{ width: 925 }}
+            />
+
+            <Autocomplete
+              sx={{ width: 150 }}
+              options={articleTypeOptions}
+              renderInput={(params) => (
+                <TextField {...params} label="Article Type" />
+              )}
+              value={formValues.articleType}
+              onChange={(_, newValue) => {
+                if (
+                  newValue &&
+                  articleTypeOptions.includes(newValue as ArticleType)
+                ) {
+                  handleChange("articleType", newValue as ArticleType);
+                } else {
+                  handleChange("articleType", "article");
+                }
+              }}
+            />
+          </Box>
+
+          <Button variant="outlined" type="submit">
+            Save
+          </Button>
+        </Box>
+
         <Box display="flex">
           <ReactQuill
             ref={quillRef}
@@ -348,6 +322,21 @@ const ArticleEditor = () => {
             className={styles.quillEditor}
           />
           <Box>
+            <Card className={styles.descriptionCard}>
+              <CardContent>
+                <Typography>Short Description</Typography>
+                <TextField
+                  sx={{ width: 500 }}
+                  name="shortDescription"
+                  value={formValues.shortDescription || ""}
+                  multiline
+                  rows={2}
+                  onChange={(e) =>
+                    handleChange("shortDescription", e.target.value)
+                  }
+                />
+              </CardContent>
+            </Card>
             <Card className={styles.thumbnailCard}>
               <CardContent>
                 <Typography>Thumbnail / Featured Image</Typography>
@@ -366,33 +355,64 @@ const ArticleEditor = () => {
             <Card className={styles.categoriesCard}>
               <CardContent>
                 <Typography>Categories and Tags</Typography>
-                <br />
-                <CategoriesMultiselect
-                  setLoading={setLoading}
-                  value={formValues.categories}
-                  onChange={(newCategories) => {
-                    handleChange("categories", newCategories);
-                  }}
-                />
-                <br />
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  options={[]}
-                  value={formValues.tags}
-                  onChange={(_, newValue) => handleChange("tags", newValue)}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Tags" />
-                  )}
-                />
+                <Box mt={2}>
+                  <CategoriesMultiselect
+                    setLoading={setLoading}
+                    value={formValues.categories}
+                    onChange={(newCategories) => {
+                      handleChange("categories", newCategories);
+                    }}
+                  />
+                </Box>
+                <Box mt={2}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={[]}
+                    value={formValues.tags}
+                    onChange={(_, newValue) => handleChange("tags", newValue)}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Tags" />
+                    )}
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+            <Card className={styles.publishCard}>
+              <CardContent>
+                <Typography>Publish Details</Typography>
+                <Box mt={2}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                      label="Publish Date"
+                      value={dayjs(formValues.publishDate)}
+                      onChange={(newValue) =>
+                        handleChange(
+                          "publishDate",
+                          newValue ? newValue.toDate() : new Date()
+                        )
+                      }
+                    />
+                  </LocalizationProvider>
+                </Box>
+                <Box mt={2}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="readyToPublish"
+                        checked={formValues.readyToPublish}
+                        onChange={(e) =>
+                          handleChange("readyToPublish", e.target.checked)
+                        }
+                      />
+                    }
+                    label="Ready to Publish"
+                  />
+                </Box>
               </CardContent>
             </Card>
           </Box>
         </Box>
-
-        <Button variant="outlined" type="submit">
-          Save
-        </Button>
       </form>
     </>
   );
