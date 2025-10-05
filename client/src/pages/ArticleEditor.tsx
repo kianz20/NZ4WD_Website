@@ -1,6 +1,9 @@
 import {
   Autocomplete,
+  Box,
   Button,
+  Card,
+  CardContent,
   Checkbox,
   FormControlLabel,
   TextField,
@@ -26,6 +29,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { ArticleDetails, Category } from "../models";
 import { ImageResize } from "quill-image-resize-module-ts";
 import { ROUTES } from "../constants/routes";
+import styles from "../styles/ArticleEditor.module.css";
 
 const articleTypeOptions = ["news", "article", "review", "brands"] as const;
 export type ArticleType = (typeof articleTypeOptions)[number];
@@ -291,23 +295,7 @@ const ArticleEditor = () => {
         />
         <br />
         <br />
-        <CategoriesMultiselect
-          setLoading={setLoading}
-          value={formValues.categories}
-          onChange={(newCategories) => {
-            handleChange("categories", newCategories);
-          }}
-        />
-        <br />
-        <Autocomplete
-          sx={{ width: 500 }}
-          multiple
-          freeSolo
-          options={[]}
-          value={formValues.tags}
-          onChange={(_, newValue) => handleChange("tags", newValue)}
-          renderInput={(params) => <TextField {...params} label="Tags" />}
-        />
+
         <br />
         <Autocomplete
           sx={{ width: 500 }}
@@ -348,25 +336,59 @@ const ArticleEditor = () => {
           }
           label="Ready to Publish"
         />
-        <ImageUpload
-          setOutput={(value) => {
-            if (value) handleChange("thumbnail", value);
-            else if (value === null) handleChange("thumbnail", undefined);
-          }}
-          downloadFileName={`${formValues.title}-thumbnail`}
-          headingText="Thumbnail"
-          existingFile={formValues.thumbnail}
-        />
-        <br />
 
-        <ReactQuill
-          ref={quillRef}
-          theme="snow"
-          value={formValues.content}
-          onChange={handleQuillChange}
-          modules={quillModules}
-          style={{ height: 1000, marginBottom: "50px" }}
-        />
+        <br />
+        <Box display="flex">
+          <ReactQuill
+            ref={quillRef}
+            theme="snow"
+            value={formValues.content}
+            onChange={handleQuillChange}
+            modules={quillModules}
+            className={styles.quillEditor}
+          />
+          <Box>
+            <Card className={styles.thumbnailCard}>
+              <CardContent>
+                <Typography>Thumbnail / Featured Image</Typography>
+                <ImageUpload
+                  setOutput={(value) => {
+                    if (value) handleChange("thumbnail", value);
+                    else if (value === null)
+                      handleChange("thumbnail", undefined);
+                  }}
+                  downloadFileName={`${formValues.title}-thumbnail`}
+                  existingFile={formValues.thumbnail}
+                  buttonLabel="Upload Thumbnail"
+                />
+              </CardContent>
+            </Card>
+            <Card className={styles.categoriesCard}>
+              <CardContent>
+                <Typography>Categories and Tags</Typography>
+                <br />
+                <CategoriesMultiselect
+                  setLoading={setLoading}
+                  value={formValues.categories}
+                  onChange={(newCategories) => {
+                    handleChange("categories", newCategories);
+                  }}
+                />
+                <br />
+                <Autocomplete
+                  multiple
+                  freeSolo
+                  options={[]}
+                  value={formValues.tags}
+                  onChange={(_, newValue) => handleChange("tags", newValue)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Tags" />
+                  )}
+                />
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
 
         <Button variant="outlined" type="submit">
           Save

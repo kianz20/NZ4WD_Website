@@ -129,7 +129,6 @@ export default function CategoriesMultiselect({
             </li>
           );
         }}
-        sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Categories" />}
       />
 

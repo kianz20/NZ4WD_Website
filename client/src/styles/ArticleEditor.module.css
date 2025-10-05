@@ -1,0 +1,17 @@
+.quillEditor {
+  height: 1000px;
+  margin-bottom: 50px;
+  width: calc(100% - 500px);
+}
+
+.thumbnailCard {
+  margin-left: 15px;
+  width: 475px;
+  height: 466px;
+}
+
+.categoriesCard {
+  margin-top: 15px;
+  margin-left: 15px;
+  width: 475px;
+}

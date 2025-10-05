@@ -50,9 +50,7 @@ const AnalyticsCard = () => {
               <ListItem>
                 <ListItemText
                   primary={
-                    row.dimensionValues[0].value.replace("/", "") == ""
-                      ? "home"
-                      : row.dimensionValues[0].value.replace("/", "")
+                    row.dimensionValues[0].value.replace("/", "") || "home"
                   }
                   secondary={`Views: ${row.metricValues[0].value}`}
                 />

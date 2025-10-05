@@ -8,11 +8,11 @@ import { AuthProvider, ToastProvider } from "./contexts";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
-      <ToastProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <ToastProvider>
           <App />
-        </BrowserRouter>
-      </ToastProvider>
+        </ToastProvider>
+      </BrowserRouter>
     </AuthProvider>
   </StrictMode>
 );
