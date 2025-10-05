@@ -2,12 +2,7 @@ import { Button, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as api from "../../api/brandController";
-import {
-  AdminNavbar,
-  HeadlineBanner,
-  ImageUpload,
-  LoadingSpinner,
-} from "../../components";
+import { AdminNavbar, ImageUpload, LoadingSpinner } from "../../components";
 import { ADMIN_ROUTES } from "../../constants/routes";
 import { useRequireAuth, useToast } from "../../hooks";
 import type { BrandDetails } from "../../models";
@@ -86,7 +81,6 @@ const BrandEditor = () => {
     <>
       <LoadingSpinner open={loading} />
       <AdminNavbar />
-      <HeadlineBanner />
       <Typography variant="h4" component="h1">
         New Brand
       </Typography>

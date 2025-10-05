@@ -49,6 +49,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       authorName: undefined,
     });
     navigate(ADMIN_ROUTES.LOGIN);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -74,6 +75,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     setLoadingAuth(false); // done checking cookies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setUserCookies = (data: LoginResponse) => {
