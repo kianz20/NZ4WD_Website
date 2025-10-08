@@ -79,7 +79,7 @@ export default function CategoriesMultiselect({
           onChange([...value, newCategoryData]);
           setDialogOpen(false);
         })
-        .catch(() => showToast("Failed to create category", "error"))
+        .catch((error) => showToast(`${error}`, "error"))
         .finally(() => setLoading(false));
     },
     [userToken, setLoading, showToast, onChange, value]
@@ -103,12 +103,22 @@ export default function CategoriesMultiselect({
         }}
         filterOptions={(options, params) => {
           const filtered = filter(options, params);
-          if (params.inputValue !== "") {
+
+          // Check if a category with the same name already exists (case-insensitive)
+          const categoryExists = options.some(
+            (option) =>
+              option.category.toLowerCase() ===
+              params.inputValue.toLowerCase().trim()
+          );
+
+          // Only show the "Add" option if the input is not empty AND it doesn't already exist
+          if (params.inputValue !== "" && !categoryExists) {
             filtered.push({
               inputValue: params.inputValue,
               category: `Add "${params.inputValue}"`,
             });
           }
+
           return filtered;
         }}
         id="categories-multiselect-dialog"

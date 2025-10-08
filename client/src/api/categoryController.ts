@@ -18,11 +18,14 @@ export const createCategory = async (
     }),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error(`Failed to create category: ${response.statusText}`);
+    throw new Error(
+      `Failed to create category: ${data.error || response.statusText}`
+    );
   }
 
-  const data: GenericOut = await response.json();
   return data;
 };
 

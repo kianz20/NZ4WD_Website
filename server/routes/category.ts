@@ -6,8 +6,15 @@ const router = express.Router();
 
 router.post("/", authenticateToken, async (req, res) => {
   try {
-    if (!req.body.category) {
+    const { category } = req.body;
+    if (!category) {
       return res.status(400).json({ error: "Category is required" });
+    }
+
+    // Check for duplicates
+    const existing = await Category.findOne({ category });
+    if (existing) {
+      return res.status(409).json({ error: "Category already exists" });
     }
 
     const newCategory = new Category({ ...req.body });
