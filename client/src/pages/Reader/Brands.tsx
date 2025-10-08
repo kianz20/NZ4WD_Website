@@ -75,8 +75,10 @@ const Brands = () => {
               clickable
               color={brand.name === chosenCategory ? "primary" : "default"}
               onClick={() => {
-                setChosenCategory(brand.name);
-                window.location.hash = brand.name;
+                if (brand.name !== chosenCategory) {
+                  setChosenCategory(brand.name);
+                  window.location.hash = brand.name;
+                }
               }}
               sx={{ mb: 1 }}
             />
