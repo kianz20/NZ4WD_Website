@@ -1,10 +1,24 @@
+import { useState } from "react";
+import {
+  Header,
+  HeadlineBanner,
+  LoadingSpinner,
+  Navbar,
+} from "../../components";
 import PageTitle from "../../components/PageTitle";
-import Articles from "./Articles";
+import ArticleBase from "./ArticleBase";
 
 const LatestNews = () => {
+  const [loading, setLoading] = useState(false);
+
   return (
     <>
-      <Articles articleFilter="news" pageTitle={"Latest News"} />
+      <LoadingSpinner open={loading} />
+      <Header />
+      <Navbar />
+      <HeadlineBanner />
+      <PageTitle text={"Latest News"} />
+      <ArticleBase setLoading={setLoading} articleFilter="news" />
     </>
   );
 };
