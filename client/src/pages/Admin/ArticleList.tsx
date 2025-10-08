@@ -135,7 +135,9 @@ const ArticleList = () => {
       if (userToken) {
         setLoading(true);
         try {
-          const response = await api.getArticles(ArticleStateOptions.All);
+          const response = await api.getArticles({
+            articleState: ArticleStateOptions.All,
+          });
           const now = new Date();
           setRows(
             response.map((article) => ({

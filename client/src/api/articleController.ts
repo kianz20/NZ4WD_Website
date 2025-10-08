@@ -71,20 +71,24 @@ export const updateArticle = async (
   return response.json();
 };
 
-export const getArticles = async (
-  articleState: string,
-  articleType?: ArticleType
-): Promise<ArticleList> => {
+export const getArticles = async ({
+  articleState,
+  articleType,
+  categoriesFilter,
+}: {
+  articleState: string;
+  articleType?: ArticleType;
+  categoriesFilter?: string;
+}): Promise<ArticleList> => {
   const url = new URL(`${BACKEND_URL}/api/articles/`);
   if (articleType) url.searchParams.append("articleType", articleType);
-  if (articleState)
-    url.searchParams.append("articleState", articleState.toString());
+  if (articleState) url.searchParams.append("articleState", articleState);
+  if (categoriesFilter)
+    url.searchParams.append("categoriesFilter", categoriesFilter);
 
   const response = await fetch(url.toString(), {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 
   if (!response.ok) {

@@ -1,7 +1,7 @@
 import * as api from "../../api/brandController";
 import { useEffect, useState } from "react";
 import { useAuth, useToast } from "../../hooks";
-import { Link } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   LoadingSpinner,
   Header,
@@ -10,6 +10,7 @@ import {
 } from "../../components";
 import PageTitle from "../../components/PageTitle";
 import ArticleBase from "./ArticleBase";
+import { Chip, Stack } from "@mui/material";
 
 interface BrandGridRows {
   id: string;
@@ -22,6 +23,8 @@ const Brands = () => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<BrandGridRows[]>([]);
+  const hashCategory = window.location.hash.slice(1);
+  const [chosenCategory, setChosenCategory] = useState(hashCategory || "");
 
   useEffect(() => {
     const getBrands = async () => {
@@ -44,8 +47,17 @@ const Brands = () => {
       }
     };
     getBrands();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userToken]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      setChosenCategory(hash);
+    };
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   return (
     <>
@@ -54,10 +66,24 @@ const Brands = () => {
       <Navbar />
       <HeadlineBanner />
       <PageTitle text={"Brands"} />
-      {rows.map((brand) => (
-        <Link href="#">{brand.name}</Link>
-      ))}
-      <ArticleBase setLoading={setLoading} />
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", mb: 2 }}>
+          {rows.map((brand) => (
+            <Chip
+              key={brand.id}
+              label={brand.name}
+              clickable
+              color={brand.name === chosenCategory ? "primary" : "default"}
+              onClick={() => {
+                setChosenCategory(brand.name);
+                window.location.hash = brand.name;
+              }}
+              sx={{ mb: 1 }}
+            />
+          ))}
+        </Stack>
+      </Box>
+      <ArticleBase setLoading={setLoading} categoriesFilter={chosenCategory} />
     </>
   );
 };

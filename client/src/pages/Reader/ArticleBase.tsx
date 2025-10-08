@@ -6,13 +6,14 @@ import { ArticleStateOptions, type ArticleList } from "../../models";
 import type { ArticleType } from "../Admin/ArticleEditor";
 
 interface ArticleBaseProps {
-  articleFilter?: ArticleType;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  articleType?: ArticleType;
+  categoriesFilter?: string;
 }
 
 const ArticleBase = (props: ArticleBaseProps) => {
   const { showToast } = useToast();
-  const { articleFilter, setLoading } = props;
+  const { articleType, setLoading, categoriesFilter } = props;
 
   const [articles, setArticles] = useState<ArticleList>();
 
@@ -20,10 +21,11 @@ const ArticleBase = (props: ArticleBaseProps) => {
     const getArticles = async () => {
       setLoading(true);
       try {
-        const response = await api.getArticles(
-          ArticleStateOptions.Published,
-          articleFilter
-        );
+        const response = await api.getArticles({
+          articleState: ArticleStateOptions.Published,
+          articleType,
+          categoriesFilter,
+        });
         setArticles(response);
       } catch {
         showToast("failed to get articles", "error");
@@ -33,7 +35,7 @@ const ArticleBase = (props: ArticleBaseProps) => {
     };
     getArticles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [categoriesFilter]);
 
   return <ArticleGrid articleList={articles} />;
 };

@@ -85,7 +85,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const { articleType, articleState } = req.query;
+    const { articleType, articleState, categoriesFilter } = req.query;
     const filter: any = {};
     const currentDate = new Date();
 
@@ -108,6 +108,13 @@ router.get("/", async (req, res) => {
           filter.publishDate = { $gt: currentDate };
           break;
       }
+    }
+
+    if (categoriesFilter) {
+      filter.$or = [
+        { "categories.category": categoriesFilter },
+        { "categories.parentCategory": categoriesFilter },
+      ];
     }
 
     const articlesAll = await Article.find(filter).select("-content");

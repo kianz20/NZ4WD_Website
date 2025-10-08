@@ -18,7 +18,7 @@ const Reviews = () => {
       <Navbar />
       <HeadlineBanner />
       <PageTitle text={"Reviews"} />
-      <ArticleBase setLoading={setLoading} articleFilter="review" />
+      <ArticleBase setLoading={setLoading} articleType="review" />
     </>
   );
 };

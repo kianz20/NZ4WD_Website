@@ -18,7 +18,7 @@ const LatestNews = () => {
       <Navbar />
       <HeadlineBanner />
       <PageTitle text={"Latest News"} />
-      <ArticleBase setLoading={setLoading} articleFilter="news" />
+      <ArticleBase setLoading={setLoading} articleType="news" />
     </>
   );
 };
