@@ -71,7 +71,7 @@ const BrandList = () => {
   }, [userToken]);
 
   const handleEdit = (id: string) => {
-    navigate(ADMIN_ROUTES.BRAND_EDITOR.replace(":id", id));
+    navigate(ADMIN_ROUTES.BRAND_EDITOR_WITH_ID.replace(":id", id));
   };
 
   const columns: GridColDef<BrandGridRows>[] = [
