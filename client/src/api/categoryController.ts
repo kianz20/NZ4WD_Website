@@ -46,3 +46,28 @@ export const getCategories = async (token: string): Promise<CategoryList> => {
 
   return (await response.json()) as CategoryList;
 };
+
+export const updateCategory = async (
+  token: string,
+  id: string,
+  categoryData: { category: string; parentCategory?: string }
+): Promise<GenericOut> => {
+  const response = await fetch(`${BACKEND_URL}/api/categories/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(categoryData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to update category: ${data.error || response.statusText}`
+    );
+  }
+
+  return data;
+};

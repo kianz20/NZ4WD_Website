@@ -16,6 +16,7 @@ const articleMenuItems = [
 const brandMenuItems = [
   { label: "All Brands", path: ADMIN_ROUTES.BRAND_LIST },
   { label: "New Brand", path: ADMIN_ROUTES.BRAND_EDITOR },
+  { label: "All Categories", path: ADMIN_ROUTES.CATEGORIES_LIST },
 ];
 
 const AdminNavbar = () => {

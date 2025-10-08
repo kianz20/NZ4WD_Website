@@ -27,6 +27,7 @@ import {
 import { ADMIN_ROUTES, ROUTES } from "./constants/routes";
 import { GOOGLE_ANALYTICS_MEASUREMENT_ID } from "./constants/googleAnalyticsMeasurementID";
 import { usePageTracking } from "./hooks";
+import CategoriesList from "./pages/Admin/CategoriesList";
 
 ReactGA.initialize([{ trackingId: GOOGLE_ANALYTICS_MEASUREMENT_ID }]);
 
@@ -40,10 +41,7 @@ const App = () => {
         }
         <Route path={ROUTES.HOME} element={<Home />} />
         <Route path={ROUTES.LATEST_NEWS} element={<LatestNews />} />
-        <Route
-          path={ROUTES.ARTICLES}
-          element={<Articles pageTitle="Articles" />}
-        />
+        <Route path={ROUTES.ARTICLES} element={<Articles />} />
         <Route path={ROUTES.ARTICLE} element={<Article />} />
         <Route path={ROUTES.REVIEWS} element={<Reviews />} />
         <Route path={ROUTES.BRANDS} element={<Brands />} />
@@ -67,6 +65,10 @@ const App = () => {
         <Route
           path={ADMIN_ROUTES.ARTICLE_EDITOR_WITH_ID}
           element={<ArticleEditor />}
+        />
+        <Route
+          path={ADMIN_ROUTES.CATEGORIES_LIST}
+          element={<CategoriesList />}
         />
       </Routes>
     </>

@@ -28,35 +28,6 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
-// router.put("/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     if (!req.body.name || !req.body.logo) {
-//       return res.status(400).json({ error: "Name and Logo are required" });
-//     }
-
-//     const brandToEdit = await Brand.findById(id);
-//     if (!brandToEdit) {
-//       return res.status(404).json({ error: "Brand not found" });
-//     }
-
-//     const update = {
-//       $set: {
-//         ...req.body,
-//       },
-//     };
-
-//     await Brand.findByIdAndUpdate(id, update, { new: true });
-
-//     res.json({ message: "Brand Updated" });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(500).json({ error: error.message });
-//     }
-//   }
-// });
-
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const categories = await Category.find();
@@ -66,53 +37,46 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-// router.get("/brand/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id) {
-//       return res.status(400).json({ error: "ID is required" });
-//     }
-//     const brandDetails = await Brand.findById(id);
-//     if (!brandDetails) {
-//       return res.status(404).json({ error: "No brand was found" });
-//     }
-//     res.status(200).json(brandDetails);
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to fetch Brand: " + error });
-//   }
-// });
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { category, parentCategory } = req.body;
 
-// router.delete("/delete/:id", authenticateToken, async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id) {
-//       return res.status(400).json({ error: "ID is required" });
-//     }
-//     const brandToDelete = await Brand.findById(id);
+    if (!category) {
+      return res.status(400).json({ error: "Category name cannot be empty" });
+    }
 
-//     if (!brandToDelete) {
-//       return res.status(404).json({ error: "Brand not found" });
-//     }
+    // 2. Check if another category already has the new name
+    const existingCategory = await Category.findOne({ category });
+    if (existingCategory && existingCategory._id.toString() !== id) {
+      return res
+        .status(409)
+        .json({ error: "Another category with this name already exists" });
+    }
 
-//     await s3.send(
-//       new DeleteObjectCommand({
-//         Bucket: bucket,
-//         Key: brandToDelete.logo.replace(prefix, ""),
-//       })
-//     );
+    const existingParentCategory = await Category.findOne({
+      category: parentCategory,
+    });
+    if (!existingParentCategory) {
+      return res.status(500).json({ error: "Parent category does not exist" });
+    }
 
-//     await Brand.findByIdAndDelete(id);
+    // 3. Find and update the category
+    const updatedCategory = await Category.findByIdAndUpdate(id, {
+      category,
+      parentCategory: parentCategory || null,
+    });
 
-//     res.status(200).json({
-//       message: "Brand deleted successfully",
-//     });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(500).json({ error: error.message });
-//     } else {
-//       res.status(500).json({ error: "An unexpected error occurred" });
-//     }
-//   }
-// });
+    if (!updatedCategory) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json({ message: "Category updated successfully", updatedCategory });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
 
 export default router;
