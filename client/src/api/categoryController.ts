@@ -1,10 +1,5 @@
 import { BACKEND_URL } from "../constants/backendURL";
-import type {
-  Category,
-  CategoryInput,
-  CategoryList,
-  GenericOut,
-} from "../models";
+import type { Category, CategoryList, GenericOut } from "../models";
 
 export const createCategory = async (
   categoryInput: Category,
