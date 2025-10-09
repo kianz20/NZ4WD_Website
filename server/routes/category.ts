@@ -54,11 +54,22 @@ router.put("/:id", authenticateToken, async (req, res) => {
         .json({ error: "Another category with this name already exists" });
     }
 
-    const existingParentCategory = await Category.findOne({
-      category: parentCategory,
-    });
-    if (!existingParentCategory) {
-      return res.status(500).json({ error: "Parent category does not exist" });
+    if (parentCategory) {
+      const existingParentCategory = await Category.findOne({
+        category: parentCategory,
+      });
+      if (!existingParentCategory) {
+        return res
+          .status(500)
+          .json({ error: "Parent category does not exist" });
+      }
+      const childCategories = await Category.find({ parentCategory: category });
+      if (childCategories.length > 0) {
+        return res.status(500).json({
+          error:
+            "You cannot add a parent category as this category has child categories",
+        });
+      }
     }
 
     // 3. Find and update the category

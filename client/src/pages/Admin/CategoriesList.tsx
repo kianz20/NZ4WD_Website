@@ -7,7 +7,6 @@ import {
   GridRowModes,
   type GridRowId,
 } from "@mui/x-data-grid";
-// ⬇️ 1. Import useMemo
 import { useEffect, useMemo, useState } from "react";
 import * as api from "../../api/categoryController";
 import { AdminNavbar, ConfirmDialog, LoadingSpinner } from "../../components";
@@ -33,10 +32,13 @@ const CategoriesList = () => {
     parentCategory?: string;
   } | null>(null);
 
+  // ⬇️ 1. MODIFIED: Create an array of objects with value and label properties.
   const parentCategoryOptions = useMemo(
     () => [
-      "",
-      ...rows.filter((row) => !row.parentCategory).map((row) => row.category),
+      { value: "", label: "None" }, // Display "None" for the empty value
+      ...rows
+        .filter((row) => !row.parentCategory)
+        .map((row) => ({ value: row.category, label: row.category })),
     ],
     [rows]
   );
@@ -71,7 +73,7 @@ const CategoriesList = () => {
             response.map((category) => ({
               id: category._id,
               category: category.category,
-              parentCategory: category.parentCategory,
+              parentCategory: category.parentCategory ?? "",
             }))
           );
         } catch {
@@ -126,7 +128,6 @@ const CategoriesList = () => {
     }
   };
 
-  // ⬇️ 3. Modify the column definition for 'parentCategory'
   const columns: GridColDef<CategoriesGridRows>[] = [
     { field: "category", headerName: "Category", width: 150, editable: true },
     {
@@ -134,8 +135,14 @@ const CategoriesList = () => {
       headerName: "Parent Category",
       width: 150,
       editable: true,
-      type: "singleSelect", // Use a dropdown for editing
-      valueOptions: parentCategoryOptions, // Provide the dynamic list of options
+      type: "singleSelect",
+      valueOptions: (params) => {
+        const currentCategory = params.row?.category;
+        // ⬇️ 2. MODIFIED: Filter based on the 'value' property of the option object.
+        return parentCategoryOptions.filter(
+          (option) => option.value !== currentCategory
+        );
+      },
     },
     {
       field: "actions",
