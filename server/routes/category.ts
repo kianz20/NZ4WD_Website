@@ -20,7 +20,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const newCategory = new Category({ ...req.body });
     await newCategory.save();
 
-    res.json({ message: "Category Created" });
+    res.json(newCategory);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ error: error.message });
@@ -75,6 +75,32 @@ router.put("/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ error: error.message });
+    }
+  }
+});
+
+router.delete("/delete/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "ID is required" });
+    }
+    const categoryToDelete = await Category.findById(id);
+
+    if (!categoryToDelete) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    await Category.findByIdAndDelete(id);
+
+    res.status(200).json({
+      message: "Category deleted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "An unexpected error occurred" });
     }
   }
 });
