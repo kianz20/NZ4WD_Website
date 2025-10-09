@@ -33,9 +33,6 @@ const CategoriesList = () => {
     parentCategory?: string;
   } | null>(null);
 
-  // ⬇️ 2. Create a memoized list of parent category options
-  // This filters the rows to find categories that are themselves parents (i.e., have no parentCategory)
-  // and adds an empty string option to allow unsetting the parent category.
   const parentCategoryOptions = useMemo(
     () => [
       "",
@@ -65,7 +62,7 @@ const CategoriesList = () => {
   };
 
   useEffect(() => {
-    const getBrands = async () => {
+    const getCategories = async () => {
       if (userToken) {
         setLoading(true);
         try {
@@ -84,7 +81,7 @@ const CategoriesList = () => {
         }
       }
     };
-    getBrands();
+    getCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userToken]);
 
@@ -189,7 +186,7 @@ const CategoriesList = () => {
       <LoadingSpinner open={loading} />
       <AdminNavbar />
       <Typography variant="h4" component="h1">
-        Brands
+        Categories
       </Typography>
       <Box sx={{ height: 800, width: "100%" }}>
         <DataGrid<CategoriesGridRows>
