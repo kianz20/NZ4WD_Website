@@ -1,5 +1,10 @@
 import { BACKEND_URL } from "../constants/backendURL";
-import type { Category, CategoryList, GenericOut } from "../models";
+import type {
+  Category,
+  CategoryInput,
+  CategoryList,
+  GenericOut,
+} from "../models";
 
 export const createCategory = async (
   categoryInput: Category,
@@ -69,5 +74,25 @@ export const updateCategory = async (
     );
   }
 
+  return data;
+};
+
+export const deleteCategory = async (
+  token: string,
+  id: string
+): Promise<GenericOut> => {
+  const response = await fetch(`${BACKEND_URL}/api/categories/delete/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete category: ${response.statusText}`);
+  }
+
+  const data: GenericOut = await response.json();
   return data;
 };
